@@ -3,17 +3,21 @@ package com.minhhai.social_network.service;
 import com.minhhai.social_network.entity.TokenResult;
 import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
+import com.minhhai.social_network.exception.JwtException;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.TokenType;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -33,6 +37,8 @@ public class JwtService {
 
     @Value("${security.jwt.refresh.key}")
     private String refreshKey;
+
+    private final TokenService tokenService;
 
     public TokenResult generateToken(User user, TokenType tokenType) {
         log.info("------------------------- generate token ------------------------------");
@@ -66,6 +72,35 @@ public class JwtService {
         } catch (JOSEException e) {
             log.error("-------------- Cannot create token --------------", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    public SignedJWT verifyToken(String token, TokenType tokenType) {
+        try {
+            JWSVerifier verifier = new MACVerifier(getSignerKey(tokenType).getBytes());
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+            Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+            var verified = signedJWT.verify(verifier);
+
+            if (!(verified && expiryTime.after(new Date()))) throw new JwtException(tokenType);
+
+            checkTokenInDB(signedJWT.getJWTClaimsSet().getJWTID(), tokenType);
+            return signedJWT;
+        } catch (JOSEException | ParseException e) {
+            throw new JwtException(tokenType);
+        }
+    }
+
+
+    public void checkTokenInDB(String jti, TokenType tokenType) {
+        if (tokenType.equals(TokenType.ACCESS_TOKEN)) {
+            // check access token in black-list.....
+            return;
+        } else if (tokenType.equals(TokenType.REFRESH_TOKEN)) {
+            tokenService.findByJti(jti)
+                    .orElseThrow(() -> new JwtException(tokenType));
         }
     }
 

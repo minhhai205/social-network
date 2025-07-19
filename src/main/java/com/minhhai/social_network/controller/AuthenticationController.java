@@ -34,4 +34,13 @@ public class AuthenticationController {
                 .build();
     }
 
+    @GetMapping("api/test")
+    public ApiSuccessResponse<String> test() {
+        return ApiSuccessResponse.<String>builder()
+                .data("okkkkkkk")
+                .message("Authenticated!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
 }
