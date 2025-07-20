@@ -5,6 +5,7 @@ import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/auth/login")
     public ApiSuccessResponse<TokenResponseDTO> login(
             @Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         return ApiSuccessResponse.<TokenResponseDTO>builder()
@@ -39,6 +40,24 @@ public class AuthenticationController {
         return ApiSuccessResponse.<String>builder()
                 .data("okkkkkkk")
                 .message("Authenticated!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/auth/refresh")
+    public ApiSuccessResponse<TokenResponseDTO> refresh(HttpServletRequest request) {
+        return ApiSuccessResponse.<TokenResponseDTO>builder()
+                .data(authenticationService.refresh(request))
+                .message("Refreshed!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/auth/logout")
+    public ApiSuccessResponse<String> logout(HttpServletRequest request) {
+        return ApiSuccessResponse.<String>builder()
+                .data(authenticationService.logout(request))
+                .message("Logged out!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

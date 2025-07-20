@@ -30,7 +30,7 @@ public class SecurityConfig {
     private final CustomAuthEntryPoint customAuthEntryPoint;
 
     private final String[] WHITE_LIST = {
-            "api/auth/**"
+            "/auth/**"
     };
 
     @Bean
