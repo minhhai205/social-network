@@ -1,8 +1,10 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.enums.AuthProvider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.Set;
@@ -15,10 +17,11 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User extends AbstractEntity<Long> {
-    @NotBlank(message = "First name must not be blank!")
+    @NotBlank(message = "Full name must not be blank!")
+    private String fullName;
+
     private String firstName;
 
-    @NotBlank(message = "Last name must not be blank!")
     private String lastName;
 
     @Column(nullable = false, unique = true)
@@ -33,6 +36,16 @@ public class User extends AbstractEntity<Long> {
     @Column(nullable = false)
     @NotBlank(message = "Password must not be blank!")
     private String password;
+
+    @NotNull(message = "Auth provider must not be blank!")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AuthProvider authProvider;
+
+    @Column(unique = true)
+    private String providerId;
+
+    private String imageUrl;
 
     @ManyToMany
     @JoinTable(

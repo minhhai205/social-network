@@ -10,6 +10,7 @@ public enum ErrorCode {
     USER_EXISTED(409, "User existed", HttpStatus.CONFLICT),
     USER_NOT_EXISTED(401, "User not existed", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(401, "User unauthorized", HttpStatus.UNAUTHORIZED),
+    OAUTH2_NOT_SUPPORTED(400, "Login not supported yet.", HttpStatus.BAD_REQUEST),
     ACCESS_DENIED(403, "Access denied", HttpStatus.FORBIDDEN),
     TOKEN_TYPE_INVALID(400, "Token type invalid", HttpStatus.BAD_REQUEST),
     JSON_INVALID(400, "JSON invalid", HttpStatus.BAD_REQUEST),
@@ -21,7 +22,8 @@ public enum ErrorCode {
     USERNAME_EXISTED(409, "Username existed", HttpStatus.CONFLICT),
     EMAIL_EXISTED(409, "Email existed", HttpStatus.CONFLICT),
     RESOURCE_NOT_FOUND(404, "Resource not found", HttpStatus.NOT_FOUND),
-    AUTHORITY_NOT_SUPPORTED(400, "Authority not supported", HttpStatus.BAD_REQUEST);
+    AUTHORITY_NOT_SUPPORTED(400, "Authority not supported", HttpStatus.BAD_REQUEST),
+    OAUTH2_INVALID_PROVIDER(401, "OAuth2 provider invalid", HttpStatus.UNAUTHORIZED);
 
     private final int code;
     private final String message;
