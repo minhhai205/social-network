@@ -2,11 +2,10 @@ package com.minhhai.social_network.config.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiErrorResponse;
-import com.minhhai.social_network.exception.AuthException;
+import com.minhhai.social_network.exception.auth.AuthException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -25,7 +24,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         if(exception instanceof AuthException ex){
             errorResponse = ApiErrorResponse.builder()
                     .status(ex.getErrorCode().getCode())
-                    .message(exception.getMessage())
+                    .message(ex.getMessage())
                     .error(ex.getErrorCode().name())
                     .build();
         } else {

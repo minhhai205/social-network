@@ -1,6 +1,6 @@
 package com.minhhai.social_network.config.oauth2.model;
 
-import com.minhhai.social_network.exception.OAuth2Exception;
+import com.minhhai.social_network.exception.auth.OAuth2Exception;
 import com.minhhai.social_network.util.enums.AuthProvider;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import lombok.Getter;

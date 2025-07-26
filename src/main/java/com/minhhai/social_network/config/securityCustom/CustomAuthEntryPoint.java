@@ -2,6 +2,7 @@ package com.minhhai.social_network.config.securityCustom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiErrorResponse;
+import com.minhhai.social_network.exception.auth.AuthException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,11 +26,20 @@ public class CustomAuthEntryPoint implements AuthenticationEntryPoint {
         response.setStatus(HttpStatus.OK.value());
         response.setContentType("application/json;charset=UTF-8");
 
-        ApiErrorResponse errorResponse = ApiErrorResponse.builder()
-                .status(HttpStatus.UNAUTHORIZED.value())
-                .message(authException.getMessage())
-                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
-                .build();
+        ApiErrorResponse errorResponse;
+        if(authException instanceof AuthException ex){
+            errorResponse = ApiErrorResponse.builder()
+                    .status(ex.getErrorCode().getCode())
+                    .message(ex.getMessage())
+                    .error(ex.getErrorCode().name())
+                    .build();
+        } else {
+            errorResponse = ApiErrorResponse.builder()
+                    .status(HttpStatus.UNAUTHORIZED.value())
+                    .message(authException.getMessage())
+                    .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                    .build();
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));

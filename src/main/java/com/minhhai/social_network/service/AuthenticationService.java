@@ -6,7 +6,7 @@ import com.minhhai.social_network.entity.Token;
 import com.minhhai.social_network.entity.TokenResult;
 import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
-import com.minhhai.social_network.exception.JwtException;
+import com.minhhai.social_network.exception.auth.JwtException;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.TokenType;

@@ -1,4 +1,4 @@
-package com.minhhai.social_network.exception;
+package com.minhhai.social_network.exception.auth;
 
 import com.minhhai.social_network.util.enums.ErrorCode;
 import lombok.Getter;

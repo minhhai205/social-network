@@ -4,7 +4,7 @@ import com.minhhai.social_network.config.oauth2.model.OAuth2UserInfo;
 import com.minhhai.social_network.config.securityModel.SecurityUser;
 import com.minhhai.social_network.entity.Role;
 import com.minhhai.social_network.entity.User;
-import com.minhhai.social_network.exception.OAuth2Exception;
+import com.minhhai.social_network.exception.auth.OAuth2Exception;
 import com.minhhai.social_network.repository.RoleRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.enums.AuthProvider;
