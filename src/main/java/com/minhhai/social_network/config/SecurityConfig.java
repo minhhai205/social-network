@@ -35,12 +35,18 @@ public class SecurityConfig {
             "/auth/**"
     };
 
+    private final String[] OPEN_API_LIST = {
+            "/actuator/**", "/v3/**", "/webjars/**",
+            "/swagger-ui*/*swagger-initializer.js", "/swagger-ui*/**"
+    };
+
     @Bean
     public SecurityFilterChain configure(@NonNull HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorizeRequests -> authorizeRequests
                                 .requestMatchers(WHITE_LIST).permitAll()
+                                .requestMatchers(OPEN_API_LIST).permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> jwtConfigurer
