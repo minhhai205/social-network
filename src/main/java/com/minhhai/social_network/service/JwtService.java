@@ -3,6 +3,7 @@ package com.minhhai.social_network.service;
 import com.minhhai.social_network.entity.TokenResult;
 import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
+import com.minhhai.social_network.exception.auth.AuthException;
 import com.minhhai.social_network.exception.auth.JwtException;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.TokenType;
@@ -71,7 +72,7 @@ public class JwtService {
             return TokenResult.builder().token(jwsObject.serialize()).jti(jti).build();
         } catch (JOSEException e) {
             log.error("-------------- Cannot create token --------------", e);
-            throw new RuntimeException(e);
+            throw new AuthException(ErrorCode.TOKEN_SIGN_FAILED);
         }
     }
 

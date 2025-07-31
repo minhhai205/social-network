@@ -23,6 +23,7 @@ public enum ErrorCode {
     EMAIL_EXISTED(409, "Email existed", HttpStatus.CONFLICT),
     RESOURCE_NOT_FOUND(404, "Resource not found", HttpStatus.NOT_FOUND),
     AUTHORITY_NOT_SUPPORTED(400, "Authority not supported", HttpStatus.BAD_REQUEST),
+    TOKEN_SIGN_FAILED(500, "Token Sign failed", HttpStatus.INTERNAL_SERVER_ERROR),
     DESTINATION_INVALID(400, "Missing destination in SUBSCRIBE frame", HttpStatus.BAD_REQUEST),
     OAUTH2_INVALID_PROVIDER(401, "OAuth2 provider invalid", HttpStatus.UNAUTHORIZED);
 
