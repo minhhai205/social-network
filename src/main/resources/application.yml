@@ -49,3 +49,8 @@ security:
     refresh:
       expired: 14
       key: ${REFRESH_KEY}
+
+logging:
+  level:
+    org.springframework.messaging: DEBUG
+    org.springframework.web.socket: DEBUG
