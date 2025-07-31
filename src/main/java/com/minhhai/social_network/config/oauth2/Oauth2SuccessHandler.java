@@ -1,7 +1,7 @@
 package com.minhhai.social_network.config.oauth2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.minhhai.social_network.config.securityModel.SecurityUser;
+import com.minhhai.social_network.config.security.securityModel.SecurityUser;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.entity.Token;

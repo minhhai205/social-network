@@ -1,10 +1,9 @@
-package com.minhhai.social_network.config.securityModel;
+package com.minhhai.social_network.config.security.securityModel;
 
 import com.minhhai.social_network.entity.Permission;
 import com.minhhai.social_network.entity.Role;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.util.enums.ErrorCode;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

@@ -1,10 +1,10 @@
-package com.minhhai.social_network.config;
+package com.minhhai.social_network.config.security;
 
 import com.minhhai.social_network.config.oauth2.CustomOAuth2UserService;
 import com.minhhai.social_network.config.oauth2.OAuth2FailureHandler;
 import com.minhhai.social_network.config.oauth2.Oauth2SuccessHandler;
-import com.minhhai.social_network.config.securityCustom.CustomAuthEntryPoint;
-import com.minhhai.social_network.config.securityCustom.CustomJwtDecoder;
+import com.minhhai.social_network.config.security.securityCustom.CustomAuthEntryPoint;
+import com.minhhai.social_network.config.security.securityCustom.CustomJwtDecoder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

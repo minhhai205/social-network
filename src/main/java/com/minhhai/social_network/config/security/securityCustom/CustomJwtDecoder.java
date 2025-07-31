@@ -1,6 +1,5 @@
-package com.minhhai.social_network.config.securityCustom;
+package com.minhhai.social_network.config.security.securityCustom;
 
-import java.text.ParseException;
 import java.util.Objects;
 import javax.crypto.spec.SecretKeySpec;
 

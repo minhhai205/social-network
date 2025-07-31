@@ -1,4 +1,4 @@
-package com.minhhai.social_network.config.securityCustom;
+package com.minhhai.social_network.config.security.securityCustom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiErrorResponse;

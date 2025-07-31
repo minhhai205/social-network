@@ -1,6 +1,6 @@
 package com.minhhai.social_network.config;
 
-import com.minhhai.social_network.config.securityCustom.CustomJwtDecoder;
+import com.minhhai.social_network.config.security.securityCustom.CustomJwtDecoder;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.enums.ErrorCode;

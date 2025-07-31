@@ -1,4 +1,4 @@
-package com.minhhai.social_network.config.securityModel;
+package com.minhhai.social_network.config.security.securityModel;
 
 import com.minhhai.social_network.entity.User;
 import lombok.Getter;
