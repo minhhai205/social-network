@@ -7,8 +7,10 @@ import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.auth.OAuth2Exception;
 import com.minhhai.social_network.repository.RoleRepository;
 import com.minhhai.social_network.repository.UserRepository;
+import com.minhhai.social_network.util.enums.Privacy;
 import com.minhhai.social_network.util.enums.AuthProvider;
 import com.minhhai.social_network.util.enums.ErrorCode;
+import com.minhhai.social_network.util.enums.Gender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -75,7 +77,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .firstName(oAuth2UserInfo.getFirstName())
                 .lastName(oAuth2UserInfo.getLastName())
                 .email(oAuth2UserInfo.getEmail())
-                .imageUrl(oAuth2UserInfo.getImageUrl())
+                .avatarUrl(oAuth2UserInfo.getImageUrl())
+                .privacy(Privacy.PUBLIC)
+                .gender(Gender.PREFER_NOT_TO_SAY)
                 .roles(Set.of(role))
                 .username(oAuth2UserInfo.getId())
                 .password(oAuth2UserInfo.getId())

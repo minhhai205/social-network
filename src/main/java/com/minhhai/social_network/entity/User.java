@@ -1,6 +1,8 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.enums.Privacy;
 import com.minhhai.social_network.util.enums.AuthProvider;
+import com.minhhai.social_network.util.enums.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +39,14 @@ public class User extends AbstractEntity<Long> {
     @NotBlank(message = "Password must not be blank!")
     private String password;
 
+    private String avatarUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Privacy privacy;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
     @NotNull(message = "Auth provider must not be blank!")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -45,7 +55,14 @@ public class User extends AbstractEntity<Long> {
     @Column(unique = true)
     private String providerId;
 
-    private String imageUrl;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userCreated", orphanRemoval = true)
+    private Set<Post> posts;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver", orphanRemoval = true)
+    private Set<Follow> followers;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender", orphanRemoval = true)
+    private Set<Follow> following;
 
     @ManyToMany
     @JoinTable(

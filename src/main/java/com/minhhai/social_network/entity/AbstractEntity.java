@@ -7,8 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.util.Date;
-
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,10 +20,8 @@ public abstract class AbstractEntity<T extends Serializable> implements Serializ
     private T id;
 
     @CreationTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }
