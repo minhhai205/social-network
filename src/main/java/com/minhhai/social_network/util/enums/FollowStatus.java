@@ -1,7 +1,16 @@
 package com.minhhai.social_network.util.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum FollowStatus {
     PENDING,
     ACCEPTED,
-    DECLINED
+    DECLINED,
+    UNKNOWN;
+
+    @JsonCreator
+    public static FollowStatus fromString(String value) {
+        return EnumUtils.fromString(FollowStatus.class, value, UNKNOWN);
+    }
 }

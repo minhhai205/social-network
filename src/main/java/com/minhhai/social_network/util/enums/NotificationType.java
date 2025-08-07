@@ -1,5 +1,7 @@
 package com.minhhai.social_network.util.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 public enum NotificationType {
     MESSAGE,
     COMMENT,
@@ -13,4 +15,10 @@ public enum NotificationType {
     GROUP_ACCEPT,
     POST_LIKE,
     COMMENT_LIKE,
+    UNKNOWN;
+
+    @JsonCreator
+    public static NotificationType fromString(String value) {
+        return EnumUtils.fromString(NotificationType.class, value, UNKNOWN);
+    }
 }

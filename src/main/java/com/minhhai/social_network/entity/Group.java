@@ -13,7 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "groups")
+@Table(name = "group_table")
 public class Group extends AbstractEntity<Long> {
     @NotBlank(message = "Group name must not be blank!")
     private String name;
