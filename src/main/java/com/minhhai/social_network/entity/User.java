@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.Privacy;
 import com.minhhai.social_network.util.enums.AuthProvider;
 import com.minhhai.social_network.util.enums.Gender;
@@ -42,14 +43,16 @@ public class User extends AbstractEntity<Long> {
     private String avatarUrl;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "User privacy", enumClass = Privacy.class)
     private Privacy privacy;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Gender", enumClass = Gender.class)
     private Gender gender;
 
     @NotNull(message = "Auth provider must not be blank!")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @EnumValue(name = "Auth provider", enumClass = AuthProvider.class)
     private AuthProvider authProvider;
 
     @Column(unique = true)

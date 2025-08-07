@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.MediaType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -17,6 +18,7 @@ public class MessageMedia extends AbstractEntity<Long>{
     private String mediaUrl;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Media type", enumClass = MediaType.class)
     private MediaType mediaType;
 
     @ManyToOne(fetch = FetchType.LAZY)

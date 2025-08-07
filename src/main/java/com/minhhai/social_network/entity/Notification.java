@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.NotificationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,7 @@ public class Notification extends AbstractEntity<Long>{
 
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Notification type must not be null!")
+    @EnumValue(name = "Notification type", enumClass = NotificationType.class)
     private NotificationType type;
 
     @ManyToOne(fetch = FetchType.LAZY)

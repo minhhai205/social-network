@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.ConversationRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,6 +25,7 @@ public class ConversationMember extends AbstractEntity<Long> {
     private Conversation conversation;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Conversation role", enumClass = ConversationRole.class)
     private ConversationRole role;
 
     @ManyToOne(fetch = FetchType.LAZY)

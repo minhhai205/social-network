@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.PostStatus;
 import com.minhhai.social_network.util.enums.PostType;
 import com.minhhai.social_network.util.enums.Privacy;
@@ -23,6 +24,7 @@ public class Post extends AbstractEntity<Long>{
     private User userCreated;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Post privacy", enumClass = Privacy.class)
     private Privacy privacy;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,9 +32,11 @@ public class Post extends AbstractEntity<Long>{
     private Group group;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Post type", enumClass = PostType.class)
     private PostType postType;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Post status", enumClass = PostStatus.class)
     private PostStatus status;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)

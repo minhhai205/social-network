@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.Privacy;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -21,6 +22,7 @@ public class Group extends AbstractEntity<Long> {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Group privacy", enumClass = Privacy.class)
     private Privacy privacy;
 
     @ManyToOne(fetch = FetchType.LAZY)

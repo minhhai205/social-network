@@ -1,5 +1,6 @@
 package com.minhhai.social_network.entity;
 
+import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.FollowStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,5 +22,6 @@ public class Follow extends AbstractEntity<Long>{
     private User receiver;
 
     @Enumerated(EnumType.STRING)
+    @EnumValue(name = "Follow status", enumClass = FollowStatus.class)
     private FollowStatus status;
 }
