@@ -26,5 +26,5 @@ public class Message extends AbstractEntity<Long>{
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "message", orphanRemoval = true)
     private Set<MessageMedia> messageMedia;
 
-    private Boolean isDeleted;
+    private boolean isDeleted;
 }

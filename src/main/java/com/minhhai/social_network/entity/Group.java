@@ -20,15 +20,15 @@ public class Group extends AbstractEntity<Long> {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private Privacy privacy;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id_created")
     private User userCreated;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", orphanRemoval = true)
     private Set<GroupMember> groupMembers;
-
-    @Enumerated(EnumType.STRING)
-    private Privacy privacy;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", orphanRemoval = true)
     private Set<Post> posts;
