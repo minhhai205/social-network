@@ -17,9 +17,8 @@ public class MessageMedia extends AbstractEntity<Long>{
     @NotBlank(message = "Media url must not be blank!")
     private String mediaUrl;
 
-    @Enumerated(EnumType.STRING)
-    @EnumValue(name = "Media type", enumClass = MediaType.class)
-    private MediaType mediaType;
+    @NotBlank(message = "Media type must not be blank!")
+    private String mediaType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id")

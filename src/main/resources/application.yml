@@ -54,3 +54,8 @@ logging:
   level:
     org.springframework.messaging: DEBUG
     org.springframework.web.socket: DEBUG
+
+cloudinary:
+  cloud-name: ${CLOUD_NAME}
+  api-key: ${CLOUD_KEY}
+  api-secret: ${CLOUD_SECRET}
