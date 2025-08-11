@@ -25,6 +25,9 @@ public enum ErrorCode {
     AUTHORITY_NOT_SUPPORTED(400, "Authority not supported", HttpStatus.BAD_REQUEST),
     TOKEN_SIGN_FAILED(500, "Token Sign failed", HttpStatus.INTERNAL_SERVER_ERROR),
     DESTINATION_INVALID(400, "Missing destination in SUBSCRIBE frame", HttpStatus.BAD_REQUEST),
+    UPLOAD_FILE_FAILED(500, "Upload file failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    CONVERSATION_NOT_EXISTED(400, "Conversation does not exist", HttpStatus.BAD_REQUEST),
+    USER_NOT_IN_CONVERSATION(400, "User not in conversation", HttpStatus.BAD_REQUEST),
     OAUTH2_INVALID_PROVIDER(401, "OAuth2 provider invalid", HttpStatus.UNAUTHORIZED);
 
     private final int code;
