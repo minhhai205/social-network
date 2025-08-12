@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -16,10 +17,19 @@ public class FileService {
     private final CloudinaryService cloudinaryService;
 
     public String upload(MessageMediaRequestDTO mediaDataRequestDTO, String folderName) throws IOException {
-        MultipartFile fileData = base64ToMultipartFile(mediaDataRequestDTO);
+        String extension = getExtension(mediaDataRequestDTO.getName());
+        String publicId = UUID.randomUUID().toString();
 
-        return cloudinaryService.uploadFile(fileData, folderName)
-                .get("secure_url").toString();
+        String url = String.format("https://res.cloudinary.com/%s/%s/upload/%s/%s.%s",
+                cloudinaryService.getCloudName(),
+                mediaDataRequestDTO.getType().split("/")[0],
+                folderName, publicId, extension
+        );
+
+        MultipartFile fileData = base64ToMultipartFile(mediaDataRequestDTO);
+        cloudinaryService.uploadFile(fileData, folderName, publicId);
+
+        return url;
     }
 
     private MultipartFile base64ToMultipartFile(MessageMediaRequestDTO data) {
@@ -33,5 +43,10 @@ public class FileService {
         }
 
         return Base64.getDecoder().decode(base64Data);
+    }
+
+    private String getExtension(String filename) {
+        int i = filename.lastIndexOf('.');
+        return (i > 0) ? filename.substring(i + 1) : "jpg";
     }
 }
