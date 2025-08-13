@@ -1,5 +1,6 @@
 package com.minhhai.social_network.controller.socket;
 
+import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
 import com.minhhai.social_network.entity.Message;
 import com.minhhai.social_network.service.socket.SocketConversationService;
@@ -23,12 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocketConversationController {
     private final SocketConversationService socketConversationService;
 
-    @MessageMapping("/message/{conversationId}")
+    @MessageMapping("/conversation/message/send_to/{conversationId}")
     public void sendMessage(
             @DestinationVariable @Min(value = 1, message = "User id must be greater than 0") long conversationId,
             @Valid MessageRequestDTO request,
             SimpMessageHeaderAccessor accessor
     ){
         socketConversationService.sendMessage(request, conversationId, accessor);
+    }
+
+
+    @MessageMapping("/conversation/create")
+    public void createConversation(
+            @Valid CreateConversationRequestDTO createDTO, SimpMessageHeaderAccessor accessor
+    ){
+        socketConversationService.createConversation(createDTO, accessor);
     }
 }

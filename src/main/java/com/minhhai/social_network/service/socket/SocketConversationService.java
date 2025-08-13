@@ -1,6 +1,8 @@
 package com.minhhai.social_network.service.socket;
 
+import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
+import com.minhhai.social_network.dto.response.NotificationResponseDTO;
 import com.minhhai.social_network.entity.*;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.mapper.MessageMapper;
@@ -9,8 +11,10 @@ import com.minhhai.social_network.repository.ConversationRepository;
 import com.minhhai.social_network.repository.MessageRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.service.FileService;
+import com.minhhai.social_network.util.enums.ConversationRole;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.NotificationType;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -19,7 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -86,14 +91,94 @@ public class SocketConversationService {
                 .type(NotificationType.MESSAGE)
                 .build();
 
+        NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
+
         // Gửi notification tới tất cả member trừ người gửi
         conversation.getConversationMember().stream()
                 .map(cm -> cm.getUser().getUsername())
                 .filter(usernameMember -> !usernameMember.equals(usernameSender))
                 .forEach(usernameMember -> {
                     simpMessagingTemplate.convertAndSendToUser(
-                            usernameMember, "/queue/chat", notificationMapper.toResponseDTO(notification));
+                            usernameMember, "/queue/chat", notificationResponseDTO);
                 });
 
+    }
+
+    @Transactional
+    public void createConversation(CreateConversationRequestDTO createDTO, SimpMessageHeaderAccessor accessor) {
+        User userCreated = userRepository.findByUsername(accessor.getUser().getName()).orElseThrow(
+                () -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        Conversation conversation = Conversation.builder()
+                .name(createDTO.isGroup() ? createDTO.getName() : null)
+                .createdBy(userCreated)
+                .isGroup(createDTO.isGroup())
+                .build();
+
+        List<User> members = checkInvalidConversationAndGetMembers(createDTO, userCreated);
+
+        Set<ConversationMember> conversationMembers = members.stream()
+                .map(member -> ConversationMember.builder()
+                        .user(member)
+                        .conversation(conversation)
+                        .role(member.getId().equals(userCreated.getId())
+                                ? ConversationRole.ADMIN
+                                : ConversationRole.MEMBER)
+                        .build())
+                .collect(Collectors.toSet());
+
+        conversation.setConversationMember(conversationMembers);
+
+        conversationRepository.save(conversation);
+
+        if(createDTO.isGroup()) {
+            Notification notification = Notification.builder()
+                    .content(userCreated.getFullName() + " just added you to the chat group.")
+                    .type(NotificationType.MESSAGE)
+                    .build();
+
+            NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
+
+            conversationMembers.stream()
+                    .map(cm -> cm.getUser().getUsername())
+                    .filter(username -> !username.equals(userCreated.getUsername()))
+                    .forEach(username -> {
+                        simpMessagingTemplate.convertAndSendToUser(
+                                username, "/queue/chat", notificationResponseDTO);
+                    });
+        }
+    }
+
+    private List<User> checkInvalidConversationAndGetMembers(CreateConversationRequestDTO createDTO, User userCreated){
+        Set<Long> memberIds = new HashSet<>(createDTO.getMemberIds());
+        memberIds.add(userCreated.getId());
+
+        if (createDTO.isGroup()) {
+            if (memberIds.size() < 2) {
+                throw new AppException(ErrorCode.CONVERSATION_MEMBER_INVALID);
+            }
+        } else {
+            if (memberIds.size() != 2) {
+                throw new AppException(ErrorCode.CONVERSATION_MEMBER_INVALID);
+            }
+            checkConversationOneToOneExisted(memberIds);
+        }
+
+        List<User> members = userRepository.findByIdIn(memberIds);
+        if(members.size() != memberIds.size()) {
+            throw new AppException(ErrorCode.CONVERSATION_MEMBER_INVALID);
+        }
+
+        return members;
+    }
+
+    private void checkConversationOneToOneExisted(Set<Long> memberIds){
+        List<Long> sortedIds = new ArrayList<>(memberIds);
+        sortedIds.sort(Long::compareTo);
+
+        Optional<Conversation> existing = conversationRepository.findOneToOneConversation(sortedIds.get(0), sortedIds.get(1));
+        if (existing.isPresent()) {
+            throw new AppException(ErrorCode.CONVERSATION_EXISTED);
+        }
     }
 }
