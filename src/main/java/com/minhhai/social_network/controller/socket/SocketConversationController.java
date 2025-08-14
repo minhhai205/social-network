@@ -1,5 +1,6 @@
 package com.minhhai.social_network.controller.socket;
 
+import com.minhhai.social_network.dto.request.AddUserToGroupChatRequestDTO;
 import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
 import com.minhhai.social_network.entity.Message;
@@ -39,5 +40,12 @@ public class SocketConversationController {
             @Valid CreateConversationRequestDTO createDTO, SimpMessageHeaderAccessor accessor
     ){
         socketConversationService.createConversation(createDTO, accessor);
+    }
+
+    @MessageMapping("/conversation/group/add_member")
+    public void addMemberToGroup(
+            @Valid AddUserToGroupChatRequestDTO addUserRequest, SimpMessageHeaderAccessor accessor
+    ){
+        socketConversationService.addUserToGroupChat(addUserRequest, accessor);
     }
 }

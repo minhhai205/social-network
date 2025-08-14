@@ -30,6 +30,7 @@ public enum ErrorCode {
     CONVERSATION_NOT_EXISTED(400, "Conversation does not exist", HttpStatus.BAD_REQUEST),
     USER_NOT_IN_CONVERSATION(400, "User not in conversation", HttpStatus.BAD_REQUEST),
     CONVERSATION_MEMBER_INVALID(400, "Conversation member invalid", HttpStatus.BAD_REQUEST),
+    CONVERSATION_INVALID(400, "Conversation invalid", HttpStatus.BAD_REQUEST),
     OAUTH2_INVALID_PROVIDER(401, "OAuth2 provider invalid", HttpStatus.UNAUTHORIZED);
 
     private final int code;

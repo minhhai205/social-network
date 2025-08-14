@@ -1,5 +1,6 @@
 package com.minhhai.social_network.service.socket;
 
+import com.minhhai.social_network.dto.request.AddUserToGroupChatRequestDTO;
 import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
 import com.minhhai.social_network.dto.response.NotificationResponseDTO;
@@ -180,5 +181,54 @@ public class SocketConversationService {
         if (existing.isPresent()) {
             throw new AppException(ErrorCode.CONVERSATION_EXISTED);
         }
+    }
+
+    @Transactional
+    public void addUserToGroupChat(@Valid AddUserToGroupChatRequestDTO addUserRequest, SimpMessageHeaderAccessor accessor) {
+
+        Conversation conversation = conversationRepository.findByIdWithAllMember(addUserRequest.getConversationId())
+                .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_EXISTED));
+
+        if(!conversation.isGroup()){
+            throw new AppException(ErrorCode.CONVERSATION_INVALID);
+        }
+
+        // Tìm user tạo yêu cầu thêm thành viên
+        String userNameAdded = accessor.getUser().getName();
+        User userAdded = conversation.getConversationMember().stream()
+                .map(ConversationMember::getUser)
+                .filter(u -> u.getUsername().equals(userNameAdded))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
+
+        Set<Long> existingMemberIds = conversation.getConversationMember().stream()
+                .map(cm -> cm.getUser().getId())
+                .collect(Collectors.toSet());
+
+        Notification notification = Notification.builder()
+                .content(userAdded.getFullName() + " just added you to the chat group.")
+                .type(NotificationType.MESSAGE)
+                .build();
+        NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
+
+        addUserRequest.getMemberIds().stream()
+                .filter(memberId -> !existingMemberIds.contains(memberId))
+                .forEach(memberId -> {
+                    User newMember = userRepository.findById(memberId)
+                            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+                    conversation.getConversationMember().add(
+                            ConversationMember.builder()
+                                    .user(newMember)
+                                    .conversation(conversation)
+                                    .role(ConversationRole.MEMBER)
+                                    .build()
+                    );
+
+                    simpMessagingTemplate.convertAndSendToUser(
+                            newMember.getUsername(), "/queue/chat", notificationResponseDTO);
+                });
+
+        conversationRepository.save(conversation);
     }
 }
