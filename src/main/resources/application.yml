@@ -10,9 +10,9 @@ spring:
     show-sql: true
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: ${DB.URL}
+    username: ${DB.USERNAME}
+    password: ${DB.PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   security:
 
@@ -20,8 +20,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${OAUTH2.GOOGLE.CLIENT_ID}
+            client-secret: ${OAUTH2.GOOGLE.CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
@@ -45,10 +45,10 @@ security:
   jwt:
     access:
       expired: 5
-      key: ${ACCESS_KEY}
+      key: ${JWT.ACCESS_KEY}
     refresh:
       expired: 14
-      key: ${REFRESH_KEY}
+      key: ${JWT.REFRESH_KEY}
 
 logging:
   level:
@@ -56,6 +56,6 @@ logging:
     org.springframework.web.socket: DEBUG
 
 cloudinary:
-  cloud-name: ${CLOUD_NAME}
-  api-key: ${CLOUD_KEY}
-  api-secret: ${CLOUD_SECRET}
+  cloud-name: ${CLOUDINARY.CLOUD_NAME}
+  api-key: ${CLOUDINARY.CLOUD_KEY}
+  api-secret: ${CLOUDINARY.CLOUD_SECRET}
