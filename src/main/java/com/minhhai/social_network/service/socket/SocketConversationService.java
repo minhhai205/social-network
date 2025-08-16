@@ -1,7 +1,8 @@
 package com.minhhai.social_network.service.socket;
 
-import com.minhhai.social_network.dto.request.AddUserToGroupChatRequestDTO;
+import com.minhhai.social_network.dto.request.GroupChatAddUserRequestDTO;
 import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
+import com.minhhai.social_network.dto.request.GroupChatDeleteUserRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
 import com.minhhai.social_network.dto.response.NotificationResponseDTO;
 import com.minhhai.social_network.entity.*;
@@ -16,6 +17,7 @@ import com.minhhai.social_network.util.enums.ConversationRole;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.NotificationType;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,8 +47,7 @@ public class SocketConversationService {
 
         // check conversation
         String usernameSender = accessor.getUser().getName();
-        Conversation conversation = conversationRepository.findByIdWithUserCreatedAndAllMember(conversationId)
-                .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_EXISTED));
+        Conversation conversation = getConversation(conversationId, false);
 
         // Tìm userSent từ danh sách members đã load
         User userSent = conversation.getConversationMember().stream()
@@ -155,7 +157,7 @@ public class SocketConversationService {
         memberIds.add(userCreated.getId());
 
         if (createDTO.isGroup()) {
-            if (memberIds.size() < 2) {
+            if (memberIds.size() <= 2) {
                 throw new AppException(ErrorCode.CONVERSATION_MEMBER_INVALID);
             }
         } else {
@@ -184,20 +186,16 @@ public class SocketConversationService {
     }
 
     @Transactional
-    public void addUserToGroupChat(@Valid AddUserToGroupChatRequestDTO addUserRequest, SimpMessageHeaderAccessor accessor) {
+    public void addUserToGroupChat(@Valid GroupChatAddUserRequestDTO addUserRequest,
+                                   SimpMessageHeaderAccessor accessor) {
 
-        Conversation conversation = conversationRepository.findByIdWithAllMember(addUserRequest.getConversationId())
-                .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_EXISTED));
-
-        if(!conversation.isGroup()){
-            throw new AppException(ErrorCode.CONVERSATION_INVALID);
-        }
+        Conversation conversation = getConversation(addUserRequest.getConversationId(), true);
 
         // Tìm user tạo yêu cầu thêm thành viên
-        String userNameAdded = accessor.getUser().getName();
-        User userAdded = conversation.getConversationMember().stream()
+        String requesterUsername = accessor.getUser().getName();
+        User addedBy = conversation.getConversationMember().stream()
                 .map(ConversationMember::getUser)
-                .filter(u -> u.getUsername().equals(userNameAdded))
+                .filter(u -> u.getUsername().equals(requesterUsername))
                 .findFirst()
                 .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
 
@@ -206,7 +204,7 @@ public class SocketConversationService {
                 .collect(Collectors.toSet());
 
         Notification notification = Notification.builder()
-                .content(userAdded.getFullName() + " just added you to the chat group.")
+                .content(addedBy.getFullName() + " just added you to the chat group.")
                 .type(NotificationType.MESSAGE)
                 .build();
         NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
@@ -227,8 +225,95 @@ public class SocketConversationService {
 
                     simpMessagingTemplate.convertAndSendToUser(
                             newMember.getUsername(), "/queue/chat", notificationResponseDTO);
+
+                    Message message = Message.builder()
+                            .content(MessageFormat.format("{0} just added {1} to the chat group.",
+                                    addedBy.getFullName(), newMember.getFullName()))
+                            .conversation(conversation)
+                            .build();
+
+                    messageRepository.save(message);
+
+                    simpMessagingTemplate.convertAndSend(
+                            "/topic/conversation/" + conversation.getId(), messageMapper.toResponseDTO(message));
                 });
 
         conversationRepository.save(conversation);
+    }
+
+
+    @Transactional
+    public void deleteMemberFromGroup(@Valid GroupChatDeleteUserRequestDTO deleteUserRequest,
+                                      SimpMessageHeaderAccessor accessor) {
+
+        Conversation conversation = getConversation(deleteUserRequest.getConversationId(), true);
+
+        String requesterUsername = accessor.getUser().getName();
+        User deletedBy = conversation.getConversationMember().stream()
+                .filter(cm -> cm.getRole() == ConversationRole.ADMIN
+                        && cm.getUser().getUsername().equals(requesterUsername))
+                .map(ConversationMember::getUser)
+                .findAny().orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
+
+        ConversationMember member = conversation.getConversationMember().stream()
+                .filter(cm -> cm.getUser().getId().equals(deleteUserRequest.getMemberId()))
+                .findAny()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_CONVERSATION));
+
+        conversation.getConversationMember().remove(member);
+
+        String content = MessageFormat.format("{0} just deleted {1} from the chat group.",
+                deletedBy.getFullName(), member.getUser().getFullName());
+        handleDeleteMember(conversation, content);
+
+    }
+
+    @Transactional
+    public void leaveGroup(@Min(value = 1, message = "Group id must be greater than 0") long conversationId,
+                           SimpMessageHeaderAccessor accessor) {
+
+        Conversation conversation = getConversation(conversationId, true);
+
+        String requesterUsername = accessor.getUser().getName();
+        ConversationMember member = conversation.getConversationMember().stream()
+                .filter(cm -> cm.getUser().getUsername().equals(requesterUsername))
+                .findAny()
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_CONVERSATION));
+
+        conversation.getConversationMember().remove(member);
+
+        String content = member.getUser().getFullName() + " has left the group.";
+        handleDeleteMember(conversation, content);
+    }
+
+    private void handleDeleteMember(Conversation conversation, String messageContent) {
+        if (conversation.getConversationMember().size() <= 1) {
+//            conversationRepository.delete(conversation);
+//            Xét deleted là true;
+            return;
+        } else {
+            conversationRepository.save(conversation);
+
+            Message message = Message.builder()
+                    .content(messageContent)
+                    .conversation(conversation)
+                    .build();
+
+            messageRepository.save(message);
+
+            simpMessagingTemplate.convertAndSend(
+                    "/topic/conversation/" + conversation.getId(), messageMapper.toResponseDTO(message));
+        }
+    }
+
+    private Conversation getConversation(long conversationId, boolean isGroup) {
+        Conversation conversation = conversationRepository
+                .findByIdWithAllMember(conversationId)
+                .orElseThrow(() -> new AppException(ErrorCode.CONVERSATION_NOT_EXISTED));
+
+        if (isGroup && !conversation.isGroup()) {
+            throw new AppException(ErrorCode.CONVERSATION_INVALID);
+        }
+        return conversation;
     }
 }

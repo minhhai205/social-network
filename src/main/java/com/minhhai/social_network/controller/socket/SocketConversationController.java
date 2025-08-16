@@ -1,11 +1,10 @@
 package com.minhhai.social_network.controller.socket;
 
-import com.minhhai.social_network.dto.request.AddUserToGroupChatRequestDTO;
+import com.minhhai.social_network.dto.request.GroupChatAddUserRequestDTO;
 import com.minhhai.social_network.dto.request.CreateConversationRequestDTO;
+import com.minhhai.social_network.dto.request.GroupChatDeleteUserRequestDTO;
 import com.minhhai.social_network.dto.request.MessageRequestDTO;
-import com.minhhai.social_network.entity.Message;
 import com.minhhai.social_network.service.socket.SocketConversationService;
-import com.minhhai.social_network.service.socket.WebSocketService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -44,8 +43,23 @@ public class SocketConversationController {
 
     @MessageMapping("/conversation/group/add_member")
     public void addMemberToGroup(
-            @Valid AddUserToGroupChatRequestDTO addUserRequest, SimpMessageHeaderAccessor accessor
+            @Valid GroupChatAddUserRequestDTO addUserRequest, SimpMessageHeaderAccessor accessor
     ){
         socketConversationService.addUserToGroupChat(addUserRequest, accessor);
+    }
+
+    @MessageMapping("/conversation/group/delete_member")
+    public void deleteMemberFromGroup(
+            @Valid GroupChatDeleteUserRequestDTO deleteUserRequest, SimpMessageHeaderAccessor accessor
+    ){
+        socketConversationService.deleteMemberFromGroup(deleteUserRequest, accessor);
+    }
+
+    @MessageMapping("/conversation/group/{id}/leave_group")
+    public void leaveGroup(
+            @DestinationVariable @Min(value = 1, message = "Group id must be greater than 0") long id,
+            SimpMessageHeaderAccessor accessor
+    ){
+        socketConversationService.leaveGroup(id, accessor);
     }
 }

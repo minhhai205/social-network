@@ -21,6 +21,7 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
     @Query("""
             SELECT c FROM Conversation c
             JOIN FETCH c.conversationMember cm
+            JOIN FETCH cm.user u
             WHERE c.id=:id
     """)
     Optional<Conversation> findByIdWithAllMember(@Param("id") Long id);
