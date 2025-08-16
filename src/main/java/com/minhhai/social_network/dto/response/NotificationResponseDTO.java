@@ -9,6 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 public class NotificationResponseDTO implements Serializable {
+    private Long id;
     private String content;
     private NotificationType type;
 }

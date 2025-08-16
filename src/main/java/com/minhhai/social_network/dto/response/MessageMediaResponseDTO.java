@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Setter
 @Builder
 public class MessageMediaResponseDTO implements Serializable {
+    private Long id;
     private String mediaType;
     private String mediaUrl;
 }
