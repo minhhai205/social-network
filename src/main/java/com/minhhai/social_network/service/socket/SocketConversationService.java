@@ -11,6 +11,7 @@ import com.minhhai.social_network.mapper.MessageMapper;
 import com.minhhai.social_network.mapper.NotificationMapper;
 import com.minhhai.social_network.repository.ConversationRepository;
 import com.minhhai.social_network.repository.MessageRepository;
+import com.minhhai.social_network.repository.NotificationRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.service.FileService;
 import com.minhhai.social_network.util.enums.ConversationRole;
@@ -41,6 +42,7 @@ public class SocketConversationService {
     private final MessageMapper messageMapper;
     private final ConversationRepository conversationRepository;
     private final NotificationMapper notificationMapper;
+    private final NotificationRepository notificationRepository;
 
     @Transactional
     public void sendMessage(MessageRequestDTO request, long conversationId, SimpMessageHeaderAccessor accessor) {
@@ -89,21 +91,9 @@ public class SocketConversationService {
         simpMessagingTemplate.convertAndSend(
                 "/topic/conversation/" + conversationId, messageMapper.toResponseDTO(message));
 
-        Notification notification = Notification.builder()
-                .content(userSent.getFullName() + " sent you a message.")
-                .type(NotificationType.MESSAGE)
-                .build();
-
-        NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
-
         // Gửi notification tới tất cả member trừ người gửi
-        conversation.getConversationMember().stream()
-                .map(cm -> cm.getUser().getUsername())
-                .filter(usernameMember -> !usernameMember.equals(usernameSender))
-                .forEach(usernameMember -> {
-                    simpMessagingTemplate.convertAndSendToUser(
-                            usernameMember, "/queue/chat", notificationResponseDTO);
-                });
+        String content = userSent.getFullName() + " sent you a message.";
+        sendNotificationToAllMember(conversation, usernameSender, content);
 
     }
 
@@ -135,20 +125,8 @@ public class SocketConversationService {
         conversationRepository.save(conversation);
 
         if(createDTO.isGroup()) {
-            Notification notification = Notification.builder()
-                    .content(userCreated.getFullName() + " just added you to the chat group.")
-                    .type(NotificationType.MESSAGE)
-                    .build();
-
-            NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
-
-            conversationMembers.stream()
-                    .map(cm -> cm.getUser().getUsername())
-                    .filter(username -> !username.equals(userCreated.getUsername()))
-                    .forEach(username -> {
-                        simpMessagingTemplate.convertAndSendToUser(
-                                username, "/queue/chat", notificationResponseDTO);
-                    });
+            String content = userCreated.getFullName() + " just added you to the chat group.";
+            sendNotificationToAllMember(conversation, userCreated.getUsername(), content);
         }
     }
 
@@ -185,6 +163,28 @@ public class SocketConversationService {
         }
     }
 
+    private void sendNotificationToAllMember(Conversation conversation, String usernameSender, String content) {
+        // Tạo list notification cho tất cả thành viên trừ sender
+        List<Notification> notifications = conversation.getConversationMember().stream()
+                .map(ConversationMember::getUser)
+                .filter(member -> !member.getUsername().equals(usernameSender))
+                .map(member -> Notification.builder()
+                        .content(content)
+                        .conversation(conversation)
+                        .sendTo(member)
+                        .type(NotificationType.MESSAGE)
+                        .build())
+                .toList();
+
+        notificationRepository.saveAll(notifications);
+
+        notifications.forEach(notification -> {
+            NotificationResponseDTO dto = notificationMapper.toResponseDTO(notification);
+            simpMessagingTemplate.convertAndSendToUser(
+                    notification.getSendTo().getUsername(), "/queue/chat", dto);
+        });
+    }
+
     @Transactional
     public void addUserToGroupChat(@Valid GroupChatAddUserRequestDTO addUserRequest,
                                    SimpMessageHeaderAccessor accessor) {
@@ -203,12 +203,6 @@ public class SocketConversationService {
                 .map(cm -> cm.getUser().getId())
                 .collect(Collectors.toSet());
 
-        Notification notification = Notification.builder()
-                .content(addedBy.getFullName() + " just added you to the chat group.")
-                .type(NotificationType.MESSAGE)
-                .build();
-        NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
-
         addUserRequest.getMemberIds().stream()
                 .filter(memberId -> !existingMemberIds.contains(memberId))
                 .forEach(memberId -> {
@@ -223,9 +217,21 @@ public class SocketConversationService {
                                     .build()
                     );
 
+                    // Send notification
+                    Notification notification = Notification.builder()
+                            .content(addedBy.getFullName() + " just added you to the chat group.")
+                            .sendTo(newMember)
+                            .conversation(conversation)
+                            .type(NotificationType.MESSAGE)
+                            .build();
+                    notificationRepository.save(notification);
+
+                    NotificationResponseDTO notificationResponseDTO = notificationMapper.toResponseDTO(notification);
+
                     simpMessagingTemplate.convertAndSendToUser(
                             newMember.getUsername(), "/queue/chat", notificationResponseDTO);
 
+                    // Send message
                     Message message = Message.builder()
                             .content(MessageFormat.format("{0} just added {1} to the chat group.",
                                     addedBy.getFullName(), newMember.getFullName()))
