@@ -12,8 +12,8 @@ import java.security.Principal;
 public class MessageExceptionHandlerAdvice {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    @MessageExceptionHandler({AppException.class})
-    public void handleIllegalMsgReceiver(AppException ex, Principal usr) {
+    @MessageExceptionHandler({Exception.class})
+    public void handleIllegalMsgReceiver(Exception ex, Principal usr) {
         // when has error with socket api-send private message to /queue/error
         simpMessagingTemplate.convertAndSendToUser(usr.getName(), "/queue/error", ex.getMessage());
     }
