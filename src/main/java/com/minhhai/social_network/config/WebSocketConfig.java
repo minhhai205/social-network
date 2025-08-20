@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Slf4j
@@ -103,8 +105,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                        case DISCONNECT -> handleDisconnect(accessor);
                    }
                } catch (Exception e) {
-                   log.error("------ Connect failed: {}", e.getMessage());
-                   return null;
+                   log.error("------ STOMP unexpected error: {}", e.getMessage());
+
+                   StompHeaderAccessor errorAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
+                   errorAccessor.setMessage(e.getMessage());
+                   errorAccessor.setLeaveMutable(true);
+
+                   return MessageBuilder.createMessage(
+                           e.getMessage().getBytes(StandardCharsets.UTF_8),
+                           errorAccessor.getMessageHeaders()
+                   );
                }
 
                 return message;
