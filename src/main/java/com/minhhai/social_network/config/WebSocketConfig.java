@@ -2,6 +2,7 @@ package com.minhhai.social_network.config;
 
 import com.minhhai.social_network.config.security.securityCustom.CustomJwtDecoder;
 import com.minhhai.social_network.exception.AppException;
+import com.minhhai.social_network.repository.ConversationMemberRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final CustomJwtDecoder jwtDecoder;
     private final UserRepository userRepository;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final ConversationMemberRepository conversationMemberRepository;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -102,6 +104,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                    switch (command) {
                        case CONNECT -> handleConnect(accessor);
                        case SUBSCRIBE -> handleSubscribe(accessor);
+                       case SEND -> handleSend(accessor);
                        case DISCONNECT -> handleDisconnect(accessor);
                    }
                } catch (Exception e) {
@@ -159,6 +162,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         log.info("-------------- User {} subscribed to {} ----------------", username, destination);
     }
 
+    private void handleSend(StompHeaderAccessor accessor){
+        String username = accessor.getUser().getName();
+        userRepository.findByUsername(username).orElseThrow(
+                () -> new AppException(ErrorCode.ACCESS_DENIED));
+    }
+
     private void handleDisconnect(StompHeaderAccessor accessor){
         String username = Objects.requireNonNull(accessor.getUser()).getName();
         setIsOnlineUser(username, false);
@@ -181,12 +190,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private void checkConversationAccess(String username, String destination) {
         if (destination.contains("conversation")) {
-            Integer conversationId = Integer.parseInt(destination.substring(destination.lastIndexOf("/") + 1));
+            Long conversationId = Long.parseLong(destination.substring(destination.lastIndexOf("/") + 1));
 
-//            if(userConversationRepository.findById_UserIdAndId_ConversationId(user.getId(), conversationId).isEmpty()) {
-//                throw new BadRequestException("Can not subscribe this port");
-//            }
+            conversationMemberRepository.findMemberByUsername(username, conversationId)
+                    .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
         }
-
     }
 }

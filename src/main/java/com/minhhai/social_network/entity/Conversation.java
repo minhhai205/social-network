@@ -28,4 +28,6 @@ public class Conversation extends AbstractEntity<Long> {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "conversation", orphanRemoval = true)
     private Set<Message> messages;
+
+    private boolean deleted;
 }

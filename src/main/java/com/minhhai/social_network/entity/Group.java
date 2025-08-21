@@ -34,4 +34,6 @@ public class Group extends AbstractEntity<Long> {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", orphanRemoval = true)
     private Set<Post> posts;
+
+    private boolean deleted;
 }

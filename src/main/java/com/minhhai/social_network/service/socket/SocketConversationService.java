@@ -294,12 +294,9 @@ public class SocketConversationService {
 
     private void handleDeleteMember(Conversation conversation, String messageContent) {
         if (conversation.getConversationMember().size() <= 1) {
-//            conversationRepository.delete(conversation);
-//            Xét deleted là true;
-            return;
-        } else {
+            conversation.setDeleted(true);
             conversationRepository.save(conversation);
-
+        } else {
             Message message = Message.builder()
                     .content(messageContent)
                     .conversation(conversation)

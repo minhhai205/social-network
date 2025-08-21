@@ -74,4 +74,6 @@ public class User extends AbstractEntity<Long> {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<Role> roles;
+
+    private boolean deleted;
 }
