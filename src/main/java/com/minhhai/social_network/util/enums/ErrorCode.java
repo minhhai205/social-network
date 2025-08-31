@@ -19,6 +19,8 @@ public enum ErrorCode {
     ROLE_EXISTED(409, "Role existed", HttpStatus.CONFLICT),
     ROLE_NOT_EXISTED(400, "Role not existed", HttpStatus.BAD_REQUEST),
     PERMISSION_NOT_EXISTED(400, "Permission not existed", HttpStatus.BAD_REQUEST),
+    GROUP_NOT_EXISTED(400, "Group does not existed", HttpStatus.BAD_REQUEST),
+    GROUP_MEMBER_EXISTED(400, "Group member existed", HttpStatus.BAD_REQUEST),
     USERNAME_EXISTED(409, "Username existed", HttpStatus.CONFLICT),
     EMAIL_EXISTED(409, "Email existed", HttpStatus.CONFLICT),
     RESOURCE_NOT_FOUND(404, "Resource not found", HttpStatus.NOT_FOUND),
