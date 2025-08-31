@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum GroupMemberStatus {
-    PENDING,
-    APPROVED,
-    REJECTED,
+    ACTIVE,
     REMOVED,
     UNKNOWN;
 

@@ -34,11 +34,4 @@ public class GroupMember extends AbstractEntity<Long> {
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime joinedAt;
-
-    @PrePersist
-    public void onJoin() {
-        if (status == GroupMemberStatus.APPROVED) {
-            joinedAt = LocalDateTime.now();
-        }
-    }
 }

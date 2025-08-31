@@ -39,7 +39,7 @@ public class GroupService {
                 .user(userCreated)
                 .group(newGroup)
                 .role(GroupRole.ADMIN)
-                .status(GroupMemberStatus.APPROVED)
+                .status(GroupMemberStatus.ACTIVE)
                 .build();
 
         Set<GroupMember> groupMembers = Set.of(groupMember);
