@@ -163,9 +163,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     private void handleSend(StompHeaderAccessor accessor){
-        String username = accessor.getUser().getName();
-        userRepository.findByUsername(username).orElseThrow(
-                () -> new AppException(ErrorCode.ACCESS_DENIED));
+//        String username = accessor.getUser().getName();
+//        userRepository.findByUsername(username).orElseThrow(
+//                () -> new AppException(ErrorCode.ACCESS_DENIED));
     }
 
     private void handleDisconnect(StompHeaderAccessor accessor){
