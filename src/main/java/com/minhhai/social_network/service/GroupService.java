@@ -2,21 +2,29 @@ package com.minhhai.social_network.service;
 
 import com.minhhai.social_network.dto.request.CreateGroupRequestDTO;
 import com.minhhai.social_network.dto.response.GroupResponseDTO;
+import com.minhhai.social_network.dto.response.JoinGroupRequestResponseDTO;
 import com.minhhai.social_network.entity.Group;
 import com.minhhai.social_network.entity.GroupMember;
+import com.minhhai.social_network.entity.JoinGroupRequest;
 import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.mapper.GroupMapper;
+import com.minhhai.social_network.mapper.JoinGroupRequestMapper;
 import com.minhhai.social_network.repository.GroupRepository;
+import com.minhhai.social_network.repository.JoinGroupRequestRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.commons.SecurityUtil;
+import com.minhhai.social_network.util.enums.ConversationRole;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.GroupMemberStatus;
 import com.minhhai.social_network.util.enums.GroupRole;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -26,6 +34,8 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final GroupMapper groupMapper;
+    private final JoinGroupRequestRepository joinGroupRequestRepository;
+    private final JoinGroupRequestMapper joinGroupRequestMapper;
 
     public GroupResponseDTO createNewGroup(CreateGroupRequestDTO createGroupRequestDTO) {
         String currentUsername = SecurityUtil.getCurrentUsername();
@@ -48,5 +58,25 @@ public class GroupService {
         groupRepository.save(newGroup);
 
         return groupMapper.toResponseDTO(newGroup);
+    }
+
+    public List<JoinGroupRequestResponseDTO> getAllGroupJoinRequest(long groupId) {
+        String currentUsername = SecurityUtil.getCurrentUsername();
+
+        Group currentGroup = groupRepository.findByIdWithAndAllMember(groupId)
+                .orElseThrow(() -> new AppException(ErrorCode.GROUP_NOT_EXISTED));
+
+        boolean hasPermission = currentGroup.getGroupMembers().stream()
+                .anyMatch(member -> member.getUser().getUsername().equals(currentUsername)
+                        && (member.getRole() == GroupRole.ADMIN || member.getRole() == GroupRole.MODERATOR)
+                );
+
+        if (!hasPermission) {
+            throw new AppException(ErrorCode.ACCESS_DENIED);
+        }
+
+        List<JoinGroupRequest> requests = joinGroupRequestRepository.findAllByGroupId(groupId);
+
+        return requests.stream().map(joinGroupRequestMapper::toResponseDTO).toList();
     }
 }
