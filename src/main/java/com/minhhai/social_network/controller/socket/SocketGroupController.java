@@ -24,4 +24,21 @@ public class SocketGroupController {
     ) {
        socketGroupService.createJoinRequest(groupId, accessor);
     }
+
+
+    @MessageMapping("/group/join-request/{requestId}/approve")
+    public void acceptJoinGroupRequest(
+            @DestinationVariable @Min(value = 1, message = "request id must be greater than 0") long requestId,
+            SimpMessageHeaderAccessor accessor
+    ) {
+        socketGroupService.acceptJoinGroupRequest(requestId, accessor);
+    }
+
+    @MessageMapping("/group/join-request/{requestId}/reject")
+    public void rejectJoinGroupRequest(
+            @DestinationVariable @Min(value = 1, message = "request id must be greater than 0") long requestId,
+            SimpMessageHeaderAccessor accessor
+    ) {
+        socketGroupService.rejectJoinGroupRequest(requestId, accessor);
+    }
 }

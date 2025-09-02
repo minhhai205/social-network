@@ -16,4 +16,20 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         AND m.group.id=:groupId
     """)
     Optional<GroupMember> findMemberByMemberId(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT m FROM GroupMember m
+        WHERE m.user.id=:memberId
+        AND m.group.id=:groupId
+        AND (m.role = 'ADMIN' OR m.role = 'MODERATOR')
+    """)
+    Optional<GroupMember> findAdminOrModeratorById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT m FROM GroupMember m
+        WHERE m.user.id=:memberId
+        AND m.group.id=:groupId
+        AND m.role = 'ADMIN'
+    """)
+    Optional<GroupMember> findAdminById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 }

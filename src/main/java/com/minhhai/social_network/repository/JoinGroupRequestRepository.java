@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JoinGroupRequestRepository extends JpaRepository<JoinGroupRequest, Long> {
@@ -17,4 +18,11 @@ public interface JoinGroupRequestRepository extends JpaRepository<JoinGroupReque
     })
     @Query("SELECT r FROM JoinGroupRequest r WHERE r.group.id=:groupId")
     List<JoinGroupRequest> findAllByGroupId(@Param("groupId") Long groupId);
+
+    @EntityGraph(attributePaths = {
+            "createdBy",
+            "group"
+    })
+    @Query("SELECT r FROM JoinGroupRequest r WHERE r.id=:requestId")
+    Optional<JoinGroupRequest> findByIdWithGroupAndUserCreated(@Param("requestId") Long requestId);
 }

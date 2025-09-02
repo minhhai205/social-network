@@ -31,7 +31,4 @@ public class GroupMember extends AbstractEntity<Long> {
     @Enumerated(EnumType.STRING)
     @EnumValue(name = "Group member status", enumClass = GroupMemberStatus.class)
     private GroupMemberStatus status;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime joinedAt;
 }

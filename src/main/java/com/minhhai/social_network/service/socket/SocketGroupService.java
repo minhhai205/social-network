@@ -9,6 +9,7 @@ import com.minhhai.social_network.mapper.NotificationMapper;
 import com.minhhai.social_network.repository.*;
 import com.minhhai.social_network.util.commons.SecurityUtil;
 import com.minhhai.social_network.util.enums.*;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -68,6 +69,68 @@ public class SocketGroupService {
                     simpMessagingTemplate.convertAndSendToUser(admin.getUsername(),
                             "/queue/notifications", notificationMapper.toResponseDTO(notification));
                 });
+    }
 
+    @Transactional
+    public void acceptJoinGroupRequest(long requestId, SimpMessageHeaderAccessor accessor) {
+        JoinGroupRequest request = verifyAndGetRequest(requestId, accessor);
+
+        request.setStatus(RequestStatus.ACCEPTED);
+        joinGroupRequestRepository.save(request);
+
+        GroupMember newGroupMember = GroupMember.builder()
+                .group(request.getGroup())
+                .user(request.getCreatedBy())
+                .role(GroupRole.MEMBER)
+                .status(GroupMemberStatus.ACTIVE)
+                .build();
+        groupMemberRepository.save(newGroupMember);
+
+        Notification notification = Notification.builder()
+                .content("You have been approved for the group " + request.getGroup().getName())
+                .sendTo(request.getCreatedBy())
+                .type(NotificationType.GROUP_ACCEPT)
+                .group(request.getGroup())
+                .build();
+        notificationRepository.save(notification);
+
+        simpMessagingTemplate.convertAndSendToUser(request.getCreatedBy().getUsername(),
+                "/queue/notifications", notificationMapper.toResponseDTO(notification));
+    }
+
+    @Transactional
+    public void rejectJoinGroupRequest(long requestId, SimpMessageHeaderAccessor accessor) {
+        JoinGroupRequest request = verifyAndGetRequest(requestId, accessor);
+
+        request.setStatus(RequestStatus.REJECTED);
+        joinGroupRequestRepository.save(request);
+
+        Notification notification = Notification.builder()
+                .content("You have been rejected for the group " + request.getGroup().getName())
+                .sendTo(request.getCreatedBy())
+                .type(NotificationType.GROUP_ACCEPT)
+                .group(request.getGroup())
+                .build();
+        notificationRepository.save(notification);
+
+        simpMessagingTemplate.convertAndSendToUser(request.getCreatedBy().getUsername(),
+                "/queue/notifications", notificationMapper.toResponseDTO(notification));
+    }
+
+    private JoinGroupRequest verifyAndGetRequest(Long requestId, SimpMessageHeaderAccessor accessor) {
+        User currentUser = userRepository.findByUsername(accessor.getUser().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        JoinGroupRequest request = joinGroupRequestRepository.findByIdWithGroupAndUserCreated(requestId)
+                .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_EXISTED));
+
+        groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), request.getGroup().getId())
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
+
+        if(!request.getStatus().equals(RequestStatus.PENDING)) {
+            throw new AppException(ErrorCode.REQUEST_PROCESSED);
+        }
+
+        return request;
     }
 }
