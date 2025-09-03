@@ -3,6 +3,7 @@ package com.minhhai.social_network.controller;
 import com.minhhai.social_network.dto.request.CreateGroupRequestDTO;
 import com.minhhai.social_network.dto.request.LoginRequestDTO;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
+import com.minhhai.social_network.dto.response.GroupMemberResponseDTO;
 import com.minhhai.social_network.dto.response.GroupResponseDTO;
 import com.minhhai.social_network.dto.response.JoinGroupRequestResponseDTO;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
@@ -45,6 +46,29 @@ public class GroupController {
         return ApiSuccessResponse.<List<JoinGroupRequestResponseDTO>>builder()
                 .data(groupService.getAllGroupJoinRequest(groupId))
                 .message("Get all successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/group/{groupId}/leave")
+    public ApiSuccessResponse<GroupMemberResponseDTO> leaveGroup(
+            @PathVariable @Min(value = 1, message = "Group id must be greater than 0") long groupId
+    ) {
+        return ApiSuccessResponse.<GroupMemberResponseDTO>builder()
+                .data(groupService.leaveGroup(groupId))
+                .message("leaved successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/group/{groupId}/member/{memberId}/delete")
+    public ApiSuccessResponse<GroupMemberResponseDTO> deleteGroupMember(
+            @PathVariable @Min(value = 1, message = "Group id must be greater than 0") long groupId,
+            @PathVariable @Min(value = 1, message = "Member id must be greater than 0") long memberId
+    ) {
+        return ApiSuccessResponse.<GroupMemberResponseDTO>builder()
+                .data(groupService.deleteMember(groupId, memberId))
+                .message("Deleted successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

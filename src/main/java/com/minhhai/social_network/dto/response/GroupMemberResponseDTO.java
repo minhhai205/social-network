@@ -24,5 +24,4 @@ public class GroupMemberResponseDTO implements Serializable {
     @EnumValue(name = "Group member status", enumClass = GroupMemberStatus.class)
     private GroupMemberStatus status;
 
-    private LocalDateTime joinedAt;
 }

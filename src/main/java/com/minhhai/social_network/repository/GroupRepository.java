@@ -17,4 +17,11 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
         WHERE gr.deleted = false
     """)
     Optional<Group> findByIdWithAndAllMember(@Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT gr FROM Group gr
+        JOIN FETCH gr.userCreated u
+        WHERE gr.deleted = false
+    """)
+    Optional<Group> findByIdWithUserCreated(@Param("groupId") Long groupId);
 }

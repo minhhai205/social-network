@@ -14,6 +14,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         SELECT m FROM GroupMember m
         WHERE m.user.id=:memberId
         AND m.group.id=:groupId
+        AND m.status = 'ACTIVE'
     """)
     Optional<GroupMember> findMemberByMemberId(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 
@@ -22,6 +23,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         WHERE m.user.id=:memberId
         AND m.group.id=:groupId
         AND (m.role = 'ADMIN' OR m.role = 'MODERATOR')
+        AND m.status = 'ACTIVE'
     """)
     Optional<GroupMember> findAdminOrModeratorById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 
@@ -30,6 +32,7 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         WHERE m.user.id=:memberId
         AND m.group.id=:groupId
         AND m.role = 'ADMIN'
+        AND m.status = 'ACTIVE'
     """)
     Optional<GroupMember> findAdminById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 }
