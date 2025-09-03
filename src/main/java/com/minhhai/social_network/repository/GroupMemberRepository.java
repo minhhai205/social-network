@@ -35,4 +35,12 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         AND m.status = 'ACTIVE'
     """)
     Optional<GroupMember> findAdminById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT m FROM GroupMember m
+        WHERE m.user.id=:memberId
+        AND m.group.id=:groupId
+        AND m.status = 'REMOVE'
+    """)
+    Optional<GroupMember> findGroupMemberRemovedById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
 }

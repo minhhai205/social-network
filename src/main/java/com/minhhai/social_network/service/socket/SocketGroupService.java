@@ -17,6 +17,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -78,13 +80,23 @@ public class SocketGroupService {
         request.setStatus(RequestStatus.ACCEPTED);
         joinGroupRequestRepository.save(request);
 
-        GroupMember newGroupMember = GroupMember.builder()
-                .group(request.getGroup())
-                .user(request.getCreatedBy())
-                .role(GroupRole.MEMBER)
-                .status(GroupMemberStatus.ACTIVE)
-                .build();
-        groupMemberRepository.save(newGroupMember);
+        // Nếu member đã từng tham gia và rời nhóm thì chỉ xét lại status
+        Optional<GroupMember> oldMemberOptional = groupMemberRepository.findGroupMemberRemovedById(
+                request.getCreatedBy().getId(), request.getGroup().getId());
+
+        if(oldMemberOptional.isPresent()) {
+            GroupMember oldMember = oldMemberOptional.get();
+            oldMember.setStatus(GroupMemberStatus.ACTIVE);
+            groupMemberRepository.save(oldMember);
+        } else {
+            GroupMember newGroupMember = GroupMember.builder()
+                    .group(request.getGroup())
+                    .user(request.getCreatedBy())
+                    .role(GroupRole.MEMBER)
+                    .status(GroupMemberStatus.ACTIVE)
+                    .build();
+            groupMemberRepository.save(newGroupMember);
+        }
 
         Notification notification = Notification.builder()
                 .content("You have been approved for the group " + request.getGroup().getName())
