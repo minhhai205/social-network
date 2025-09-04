@@ -16,13 +16,13 @@ public interface JoinGroupRequestRepository extends JpaRepository<JoinGroupReque
     @EntityGraph(attributePaths = {
             "createdBy"
     })
-    @Query("SELECT r FROM JoinGroupRequest r WHERE r.group.id=:groupId")
+    @Query("SELECT r FROM JoinGroupRequest r WHERE r.group.id=:groupId AND r.status = 'PENDING'")
     List<JoinGroupRequest> findAllByGroupId(@Param("groupId") Long groupId);
 
     @EntityGraph(attributePaths = {
             "createdBy",
             "group"
     })
-    @Query("SELECT r FROM JoinGroupRequest r WHERE r.id=:requestId")
+    @Query("SELECT r FROM JoinGroupRequest r WHERE r.id=:requestId AND r.status = 'PENDING'")
     Optional<JoinGroupRequest> findByIdWithGroupAndUserCreated(@Param("requestId") Long requestId);
 }

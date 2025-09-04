@@ -15,6 +15,7 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
         JOIN FETCH gr.groupMembers gm
         JOIN FETCH gm.user u
         WHERE gr.deleted = false
+        AND gm.status = 'ACTIVE'
     """)
     Optional<Group> findByIdWithAndAllMember(@Param("groupId") Long groupId);
 

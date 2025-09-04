@@ -17,6 +17,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -38,7 +39,7 @@ public class SocketGroupService {
         User curentUser = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Group currentGroup = groupRepository.findByIdWithAndAllMember(groupId).orElseThrow(
+        Group currentGroup = groupRepository.findById(groupId).orElseThrow(
                 () -> new AppException(ErrorCode.GROUP_NOT_EXISTED));
 
         if(groupMemberRepository.findMemberByMemberId(curentUser.getId(), groupId).isPresent()) {
@@ -53,24 +54,22 @@ public class SocketGroupService {
 
         joinGroupRequestRepository.save(request);
 
-        // send notification to all admin
-        currentGroup.getGroupMembers().stream()
-                .filter(gm -> gm.getRole().equals(GroupRole.ADMIN))
-                .map(GroupMember::getUser)
-                .forEach(admin -> {
+        // send notification to all admin and moderator
+        List<GroupMember> adminsAndModerators = groupMemberRepository.findAllAdminAndModeratorByGroupId(groupId);
 
-                    Notification notification = Notification.builder()
-                            .content(curentUser.getFullName() + " created request to join group " + currentGroup.getName())
-                            .type(NotificationType.GROUP_REQUEST)
-                            .group(currentGroup)
-                            .sendTo(admin)
-                            .build();
+        adminsAndModerators.forEach(admin -> {
+            Notification notification = Notification.builder()
+                    .content(curentUser.getFullName() + " created request to join group " + currentGroup.getName())
+                    .type(NotificationType.GROUP_REQUEST)
+                    .group(currentGroup)
+                    .sendTo(admin.getUser())
+                    .build();
 
-                    notificationRepository.save(notification);
+            notificationRepository.save(notification);
 
-                    simpMessagingTemplate.convertAndSendToUser(admin.getUsername(),
-                            "/queue/notifications", notificationMapper.toResponseDTO(notification));
-                });
+            simpMessagingTemplate.convertAndSendToUser(admin.getUser().getUsername(),
+                    "/queue/notifications", notificationMapper.toResponseDTO(notification));
+        });
     }
 
     @Transactional
@@ -138,10 +137,6 @@ public class SocketGroupService {
 
         groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), request.getGroup().getId())
                 .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
-
-        if(!request.getStatus().equals(RequestStatus.PENDING)) {
-            throw new AppException(ErrorCode.REQUEST_PROCESSED);
-        }
 
         return request;
     }

@@ -69,18 +69,14 @@ public class GroupService {
 
     public List<JoinGroupRequestResponseDTO> getAllGroupJoinRequest(long groupId) {
         String currentUsername = SecurityUtil.getCurrentUsername();
+        User currentUser = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
-        Group currentGroup = groupRepository.findByIdWithAndAllMember(groupId)
+        Group currentGroup = groupRepository.findById(groupId)
                 .orElseThrow(() -> new AppException(ErrorCode.GROUP_NOT_EXISTED));
 
-        boolean hasPermission = currentGroup.getGroupMembers().stream()
-                .anyMatch(member -> member.getUser().getUsername().equals(currentUsername)
-                        && (member.getRole() == GroupRole.ADMIN || member.getRole() == GroupRole.MODERATOR)
-                );
-
-        if (!hasPermission) {
-            throw new AppException(ErrorCode.ACCESS_DENIED);
-        }
+        groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), currentGroup.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
 
         List<JoinGroupRequest> requests = joinGroupRequestRepository.findAllByGroupId(groupId);
 
