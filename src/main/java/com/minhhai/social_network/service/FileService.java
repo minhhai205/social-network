@@ -1,6 +1,6 @@
 package com.minhhai.social_network.service;
 
-import com.minhhai.social_network.dto.request.MessageMediaRequestDTO;
+import com.minhhai.social_network.dto.request.MediaRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.UUID;
 public class FileService {
     private final CloudinaryService cloudinaryService;
 
-    public String upload(MessageMediaRequestDTO mediaDataRequestDTO, String folderName) throws IOException {
+    public String upload(MediaRequestDTO mediaDataRequestDTO, String folderName) throws IOException {
         String extension = getExtension(mediaDataRequestDTO.getName());
         String publicId = UUID.randomUUID().toString();
 
@@ -32,7 +32,7 @@ public class FileService {
         return url;
     }
 
-    private MultipartFile base64ToMultipartFile(MessageMediaRequestDTO data) {
+    private MultipartFile base64ToMultipartFile(MediaRequestDTO data) {
         byte[] bytes = decodeBase64(data.getBase64Data());
         return new MockMultipartFile(data.getName(), data.getName(), data.getType(), bytes);
     }

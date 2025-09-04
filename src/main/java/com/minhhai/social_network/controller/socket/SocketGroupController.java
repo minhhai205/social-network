@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SocketGroupController {
     private final SocketGroupService socketGroupService;
 
-    @MessageMapping("/group/{groupId}/join-request")
-    public void joinGroupRequest(
+    @MessageMapping("/group/{groupId}/join-request/create")
+    public void createJoinGroupRequest(
             @DestinationVariable @Min(value = 1, message = "group id must be greater than 0") long groupId,
             SimpMessageHeaderAccessor accessor
     ) {

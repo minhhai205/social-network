@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -43,4 +44,13 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
         AND m.status = 'REMOVE'
     """)
     Optional<GroupMember> findGroupMemberRemovedById(@Param("memberId") Long memberId, @Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT m FROM GroupMember m
+        JOIN FETCH m.user u
+        WHERE m.group.id=:groupId
+        AND (m.role = 'ADMIN' OR m.role = 'MODERATOR')
+        AND m.status = 'ACTIVE'
+    """)
+    List<GroupMember> findAllAdminAndModeratorByGroupId(@Param("groupId") Long groupId);
 }
