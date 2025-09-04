@@ -25,6 +25,7 @@ public enum ErrorCode {
     GROUP_MEMBER_NOT_EXISTED(400, "Group member not existed", HttpStatus.BAD_REQUEST),
     REQUEST_PROCESSED(409, "Request processed", HttpStatus.BAD_REQUEST),
     INVALID_REQUEST(400, "Invalid request", HttpStatus.BAD_REQUEST),
+    POST_NOT_EXISTED(400, "Post not existed", HttpStatus.BAD_REQUEST),
     USERNAME_EXISTED(409, "Username existed", HttpStatus.CONFLICT),
     EMAIL_EXISTED(409, "Email existed", HttpStatus.CONFLICT),
     RESOURCE_NOT_FOUND(404, "Resource not found", HttpStatus.NOT_FOUND),

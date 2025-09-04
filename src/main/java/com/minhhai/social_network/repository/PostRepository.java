@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -18,4 +19,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         AND p.status = 'PENDING'
     """)
     List<Post> findAllCreatePostRequestByGroupId(@Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT p FROM Post p
+        JOIN FETCH p.userCreated u
+        JOIN FETCH p.group g
+        WHERE p.id =:postId
+        AND p.status = 'PENDING'
+    """)
+    Optional<Post> findByIdWithGroupAndUserCreated(@Param("postId") Long postId);
 }

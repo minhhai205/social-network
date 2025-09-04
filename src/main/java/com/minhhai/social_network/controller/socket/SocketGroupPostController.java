@@ -28,4 +28,20 @@ public class SocketGroupPostController {
     ) {
         socketGroupPostService.createPostRequest(groupId, createPostRequestDTO, accessor);
     }
+
+    @MessageMapping("/group/post/{postId}/approve")
+    public void acceptJoinGroupRequest(
+            @DestinationVariable @Min(value = 1, message = "Post id must be greater than 0") long postId,
+            SimpMessageHeaderAccessor accessor
+    ) {
+        socketGroupPostService.acceptCreatePostRequest(postId, accessor);
+    }
+
+    @MessageMapping("/group/post/{postId}/reject")
+    public void rejectJoinGroupRequest(
+            @DestinationVariable @Min(value = 1, message = "Post id must be greater than 0") long postId,
+            SimpMessageHeaderAccessor accessor
+    ) {
+        socketGroupPostService.rejectCreatePostRequest(postId, accessor);
+    }
 }

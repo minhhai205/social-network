@@ -7,11 +7,13 @@ import com.minhhai.social_network.mapper.NotificationMapper;
 import com.minhhai.social_network.repository.*;
 import com.minhhai.social_network.service.FileService;
 import com.minhhai.social_network.util.enums.*;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -96,5 +98,56 @@ public class SocketGroupPostService {
             });
         }
 
+    }
+
+    @Transactional
+    public void acceptCreatePostRequest(long postId, SimpMessageHeaderAccessor accessor) {
+        Post post = verifyAndGetPost(postId, accessor);
+
+        post.setStatus(PostStatus.APPROVED);
+        postRepository.save(post);
+
+        Notification notification = Notification.builder()
+                .content("Your post has been approved in the group " + post.getGroup().getName())
+                .sendTo(post.getUserCreated())
+                .type(NotificationType.GROUP_ACCEPT)
+                .group(post.getGroup())
+                .build();
+        notificationRepository.save(notification);
+
+        simpMessagingTemplate.convertAndSendToUser(post.getUserCreated().getUsername(),
+                "/queue/notifications", notificationMapper.toResponseDTO(notification));
+    }
+
+    @Transactional
+    public void rejectCreatePostRequest(long postId, SimpMessageHeaderAccessor accessor) {
+        Post post = verifyAndGetPost(postId, accessor);
+
+        post.setStatus(PostStatus.REJECTED);
+        postRepository.save(post);
+
+        Notification notification = Notification.builder()
+                .content("Your post has been rejected in the group " + post.getGroup().getName())
+                .sendTo(post.getUserCreated())
+                .type(NotificationType.GROUP_POST)
+                .group(post.getGroup())
+                .build();
+        notificationRepository.save(notification);
+
+        simpMessagingTemplate.convertAndSendToUser(post.getUserCreated().getUsername(),
+                "/queue/notifications", notificationMapper.toResponseDTO(notification));
+    }
+
+    private Post verifyAndGetPost(Long postId, SimpMessageHeaderAccessor accessor) {
+        User currentUser = userRepository.findByUsername(accessor.getUser().getName())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        Post post = postRepository.findByIdWithGroupAndUserCreated(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
+
+        groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), post.getGroup().getId())
+                .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
+
+        return post;
     }
 }
