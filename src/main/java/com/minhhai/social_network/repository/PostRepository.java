@@ -13,6 +13,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
         SELECT p FROM Post p
         JOIN FETCH p.userCreated u
+        JOIN FETCH p.postMedia m
         WHERE p.group.id=:groupId
         AND p.status = 'PENDING'
     """)
