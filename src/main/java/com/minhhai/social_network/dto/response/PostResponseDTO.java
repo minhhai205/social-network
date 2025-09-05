@@ -32,5 +32,6 @@ public class PostResponseDTO implements Serializable {
 
     private Set<PostMediaResponseDTO> postMedia;
 
-//    private Set<PostLike> postLikes;
+//    private Long countLikes;
+//    private Long countComments;
 }
