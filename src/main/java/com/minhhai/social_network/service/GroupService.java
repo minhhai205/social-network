@@ -86,18 +86,16 @@ public class GroupService {
     @Transactional
     public GroupMemberResponseDTO leaveGroup(long groupId) {
         String currentUsername = SecurityUtil.getCurrentUsername();
-        User currentUser = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         Group currentGroup = groupRepository.findByIdWithUserCreated(groupId)
                 .orElseThrow(() -> new AppException(ErrorCode.GROUP_NOT_EXISTED));
 
         // người tạo nhóm không được rời nhóm
-        if(Objects.equals(currentUser.getId(), currentGroup.getUserCreated().getId())){
+        if(Objects.equals(currentUsername, currentGroup.getUserCreated().getUsername())){
             throw new AppException(ErrorCode.INVALID_REQUEST);
         }
 
-        GroupMember memberLeave = groupMemberRepository.findMemberByMemberId(currentUser.getId(), currentGroup.getId())
+        GroupMember memberLeave = groupMemberRepository.findMemberByUsername(currentUsername, currentGroup.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.GROUP_MEMBER_NOT_EXISTED));
 
         memberLeave.setStatus(GroupMemberStatus.REMOVED);
@@ -107,23 +105,21 @@ public class GroupService {
     }
 
     @Transactional
-    public GroupMemberResponseDTO deleteMember(Long groupId, Long memberId) {
+    public GroupMemberResponseDTO deleteMember(Long groupId, Long userId) {
         String currentUsername = SecurityUtil.getCurrentUsername();
-        User currentUser = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
         Group currentGroup = groupRepository.findByIdWithUserCreated(groupId)
                 .orElseThrow(() -> new AppException(ErrorCode.GROUP_NOT_EXISTED));
 
-        GroupMember currentMember = groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), currentGroup.getId())
+        GroupMember currentMember = groupMemberRepository.findAdminOrModeratorByUsername(currentUsername, currentGroup.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
 
-        GroupMember memberToRemove = groupMemberRepository.findMemberByMemberId(memberId, currentGroup.getId())
+        GroupMember memberToRemove = groupMemberRepository.findMemberByMemberId(userId, currentGroup.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.GROUP_MEMBER_NOT_EXISTED));
 
         if (currentMember.getRole() == GroupRole.ADMIN) {
             // Admin có thể xóa bất kỳ ai trừ chính mình và creator
-            if (memberId.equals(currentUser.getId()) || memberId.equals(currentGroup.getUserCreated().getId())) {
+            if (userId.equals(currentMember.getUser().getId()) || userId.equals(currentGroup.getUserCreated().getId())) {
                 throw new AppException(ErrorCode.INVALID_REQUEST);
             }
         } else if (currentMember.getRole() == GroupRole.MODERATOR) {

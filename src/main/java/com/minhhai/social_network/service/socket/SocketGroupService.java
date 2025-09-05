@@ -119,7 +119,7 @@ public class SocketGroupService {
         Notification notification = Notification.builder()
                 .content("You have been rejected for the group " + request.getGroup().getName())
                 .sendTo(request.getCreatedBy())
-                .type(NotificationType.GROUP_ACCEPT)
+                .type(NotificationType.GROUP_POST)
                 .group(request.getGroup())
                 .build();
         notificationRepository.save(notification);

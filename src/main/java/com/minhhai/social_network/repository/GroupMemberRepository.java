@@ -21,6 +21,14 @@ public interface GroupMemberRepository extends JpaRepository<GroupMember, Long> 
 
     @Query("""
         SELECT m FROM GroupMember m
+        WHERE m.user.username=:username
+        AND m.group.id=:groupId
+        AND m.status = 'ACTIVE'
+    """)
+    Optional<GroupMember> findMemberByUsername(@Param("username") String username, @Param("groupId") Long groupId);
+
+    @Query("""
+        SELECT m FROM GroupMember m
         WHERE m.user.id=:memberId
         AND m.group.id=:groupId
         AND (m.role = 'ADMIN' OR m.role = 'MODERATOR')

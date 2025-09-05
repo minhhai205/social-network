@@ -1,6 +1,7 @@
 package com.minhhai.social_network.controller;
 
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
+import com.minhhai.social_network.dto.response.GroupMemberResponseDTO;
 import com.minhhai.social_network.dto.response.JoinGroupRequestResponseDTO;
 import com.minhhai.social_network.dto.response.PostResponseDTO;
 import com.minhhai.social_network.service.GroupPostService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -31,6 +33,28 @@ public class GroupPostController {
         return ApiSuccessResponse.<List<PostResponseDTO>>builder()
                 .data(groupPostService.getAllCreatePostRequest(groupId))
                 .message("Get all successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/group/post/{postId}/user-delete")
+    public ApiSuccessResponse<PostResponseDTO> deleteMyPost(
+            @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long postId
+    ) {
+        return ApiSuccessResponse.<PostResponseDTO>builder()
+                .data(groupPostService.deleteMyPost(postId))
+                .message("leaved successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/group/post/{postId}/admin-delete")
+    public ApiSuccessResponse<PostResponseDTO> adminDeletePost(
+            @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long postId
+    ) {
+        return ApiSuccessResponse.<PostResponseDTO>builder()
+                .data(groupPostService.adminDeletePost(postId))
+                .message("Deleted successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

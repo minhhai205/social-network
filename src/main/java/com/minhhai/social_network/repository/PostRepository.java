@@ -27,5 +27,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         WHERE p.id =:postId
         AND p.status = 'PENDING'
     """)
+    Optional<Post> findRequestByIdWithGroupAndUserCreated(@Param("postId") Long postId);
+
+    @Query("""
+        SELECT p FROM Post p
+        JOIN FETCH p.userCreated u
+        JOIN FETCH p.group g
+        JOIN FETCH p.postMedia m
+        WHERE p.id =:postId
+        AND (p.status = 'PENDING' OR p.status = 'APPROVED')
+    """)
     Optional<Post> findByIdWithGroupAndUserCreated(@Param("postId") Long postId);
 }

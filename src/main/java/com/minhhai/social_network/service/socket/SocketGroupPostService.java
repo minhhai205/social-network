@@ -142,7 +142,7 @@ public class SocketGroupPostService {
         User currentUser = userRepository.findByUsername(accessor.getUser().getName())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
 
-        Post post = postRepository.findByIdWithGroupAndUserCreated(postId)
+        Post post = postRepository.findRequestByIdWithGroupAndUserCreated(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
 
         groupMemberRepository.findAdminOrModeratorById(currentUser.getId(), post.getGroup().getId())

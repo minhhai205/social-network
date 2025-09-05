@@ -61,13 +61,13 @@ public class GroupController {
                 .build();
     }
 
-    @PostMapping("/group/{groupId}/member/{memberId}/delete")
+    @PostMapping("/group/{groupId}/member/{userId}/delete")
     public ApiSuccessResponse<GroupMemberResponseDTO> deleteGroupMember(
             @PathVariable @Min(value = 1, message = "Group id must be greater than 0") long groupId,
-            @PathVariable @Min(value = 1, message = "Member id must be greater than 0") long memberId
+            @PathVariable @Min(value = 1, message = "Member id must be greater than 0") long userId
     ) {
         return ApiSuccessResponse.<GroupMemberResponseDTO>builder()
-                .data(groupService.deleteMember(groupId, memberId))
+                .data(groupService.deleteMember(groupId, userId))
                 .message("Deleted successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
