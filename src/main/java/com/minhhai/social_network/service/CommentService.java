@@ -16,8 +16,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,13 +50,16 @@ public class CommentService {
         }
 
         Page<Comment> comments = commentRepository.findAll(builder.build(), pageable);
-        return convertToPageResponse(comments, pageable);
 
+        return convertToPageResponse(comments, pageable);
     }
 
     private PageResponse<List<CommentResponseDTO>> convertToPageResponse(Page<Comment> comments, Pageable pageable) {
 
-        List<CommentResponseDTO> response = comments.getContent().stream().map(commentMapper::toResponseDTO).toList();
+        List<CommentResponseDTO> response = comments.getContent().stream()
+                .map(commentMapper::toResponseDTO).toList();
+
+        getTotalLikeForComment(response);
 
         log.info("--------- Get comments successfully ----------");
 
@@ -64,5 +69,19 @@ public class CommentService {
                 .totalPage(comments.getTotalPages())
                 .items(response)
                 .build();
+    }
+
+    private void getTotalLikeForComment(List<CommentResponseDTO> commentResponses) {
+        List<Long> commentIds = commentResponses.stream().map(CommentResponseDTO::getId).toList();
+
+        Map<Long, Long> likeCountMap = commentRepository.findLikeCountForComments(commentIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        commentResponses.forEach(comment -> {
+            comment.setCountLikes(likeCountMap.get(comment.getId()));
+        });
     }
 }
