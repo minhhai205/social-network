@@ -28,4 +28,13 @@ public class SocketCommentController {
         socketCommentService.createPostComment(postId, commentRequestDTO, accessor);
     }
 
+    @MessageMapping("/comment/reply/{commentId}")
+    public void createReplyComment(
+            @DestinationVariable @Min(value = 1, message = "Comment id must be greater than 0") long commentId,
+            @Valid CommentRequestDTO commentRequestDTO,
+            SimpMessageHeaderAccessor accessor
+    ) {
+        socketCommentService.createReplyComment(commentId, commentRequestDTO, accessor);
+    }
+
 }

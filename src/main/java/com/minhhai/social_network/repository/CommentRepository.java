@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
@@ -29,4 +30,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         GROUP BY c.id
     """)
     List<Object[]> findLikeCountForComments(@Param("commentIds") List<Long> commentIds);
+
+    @Query("""
+        SELECT c FROM Comment c
+        LEFT JOIN FETCH c.userCreated u
+        LEFT JOIN FETCH c.parentComment pc
+        LEFT JOIN FETCH c.post p
+        WHERE c.id=:commentId
+    """)
+    Optional<Comment> findByIdWithAllDetailAndGroup(@Param("commentId") Long commentId);
 }

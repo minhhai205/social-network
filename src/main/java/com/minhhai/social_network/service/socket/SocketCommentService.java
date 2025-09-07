@@ -17,8 +17,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +52,7 @@ public class SocketCommentService {
 
         if(!userComment.getId().equals(post.getUserCreated().getId())){
             Notification notification = Notification.builder()
-                    .content(userComment.getFullName() + " just liked one of your posts.")
+                    .content(userComment.getFullName() + " just commented on your post.")
                     .sendTo(post.getUserCreated())
                     .type(NotificationType.COMMENT)
                     .post(post)
@@ -62,6 +60,44 @@ public class SocketCommentService {
             notificationRepository.save(notification);
 
             simpMessagingTemplate.convertAndSendToUser(post.getUserCreated().getUsername(),
+                    "/queue/notifications", notificationMapper.toResponseDTO(notification));
+        }
+    }
+
+    public void createReplyComment(long commentId, CommentRequestDTO commentRequestDTO,
+                                   SimpMessageHeaderAccessor accessor) {
+        String currentUsername = accessor.getUser().getName();
+        User userComment = userRepository.findByUsername(currentUsername)
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHORIZED));
+
+        Comment comment = commentRepository.findByIdWithAllDetailAndGroup(commentId)
+                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_EXISTED));
+
+        Post post = comment.getPost();
+        if(post.getPostType() == PostType.GROUP){
+            groupMemberRepository.findMemberByMemberId(userComment.getId(), post.getGroup().getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
+        }
+
+        // Chỉ lưu cây comment 2 cấp
+        Comment commentReply = Comment.builder()
+                .content(commentRequestDTO.getContent())
+                .userCreated(userComment)
+                .parentComment(comment.getParentComment() == null ? comment : comment.getParentComment())
+                .post(post)
+                .build();
+        commentRepository.save(commentReply);
+
+        if(!userComment.getId().equals(comment.getUserCreated().getId())){
+            Notification notification = Notification.builder()
+                    .content(userComment.getFullName() + " just replied to your comment.")
+                    .sendTo(comment.getUserCreated())
+                    .type(NotificationType.COMMENT)
+                    .post(post)
+                    .build();
+            notificationRepository.save(notification);
+
+            simpMessagingTemplate.convertAndSendToUser(comment.getUserCreated().getUsername(),
                     "/queue/notifications", notificationMapper.toResponseDTO(notification));
         }
     }

@@ -21,6 +21,7 @@ public enum ErrorCode {
     PERMISSION_NOT_EXISTED(400, "Permission not existed", HttpStatus.BAD_REQUEST),
     GROUP_NOT_EXISTED(400, "Group does not existed", HttpStatus.BAD_REQUEST),
     REQUEST_NOT_EXISTED(400, "Request not existed", HttpStatus.BAD_REQUEST),
+    COMMENT_NOT_EXISTED(400, "Comment not existed", HttpStatus.BAD_REQUEST),
     GROUP_MEMBER_EXISTED(400, "Group member existed", HttpStatus.BAD_REQUEST),
     GROUP_MEMBER_NOT_EXISTED(400, "Group member not existed", HttpStatus.BAD_REQUEST),
     REQUEST_PROCESSED(409, "Request processed", HttpStatus.BAD_REQUEST),
