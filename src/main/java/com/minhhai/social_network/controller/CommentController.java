@@ -36,4 +36,17 @@ public class CommentController {
                 .status(HttpStatus.OK.value())
                 .build();
     }
+
+    @GetMapping("/comment/reply/{commentId}")
+    public ApiSuccessResponse<PageResponse<List<CommentResponseDTO>>> getAllReplyCommentWithFilter(
+            @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long commentId,
+            Pageable pageable,
+            @RequestParam(required = false) String... filters
+    ) {
+        return ApiSuccessResponse.<PageResponse<List<CommentResponseDTO>>>builder()
+                .data(commentService.getAllReplyCommentWithFilter(commentId, pageable, filters))
+                .message("Get all successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
 }

@@ -7,6 +7,7 @@ import com.minhhai.social_network.mapper.CommentMapper;
 import com.minhhai.social_network.repository.CommentRepository;
 import com.minhhai.social_network.repository.specification.SpecificationsBuilder;
 import com.minhhai.social_network.util.commons.AppConst;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,20 @@ public class CommentService {
 
         filterList.add("post.id:" + postId);
 
+        return getAllComment(filterList, pageable);
+    }
+
+    public PageResponse<List<CommentResponseDTO>> getAllReplyCommentWithFilter(long commentId, Pageable pageable, String[] filters) {
+        List<String> filterList = (filters != null)
+                ? new ArrayList<>(Arrays.asList(filters))
+                : new ArrayList<>();
+
+        filterList.add("parentComment.id:" + commentId);
+
+        return getAllComment(filterList, pageable);
+    }
+
+    private PageResponse<List<CommentResponseDTO>> getAllComment(List<String> filterList, Pageable pageable) {
         SpecificationsBuilder builder = new SpecificationsBuilder();
         Pattern pattern = Pattern.compile(AppConst.SEARCH_SPEC_OPERATOR);
 
@@ -84,4 +99,6 @@ public class CommentService {
             comment.setCountLikes(likeCountMap.get(comment.getId()));
         });
     }
+
+
 }
