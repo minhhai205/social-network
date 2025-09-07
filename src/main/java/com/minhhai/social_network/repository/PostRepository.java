@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
         SELECT p FROM Post p
         JOIN FETCH p.userCreated u
-        JOIN FETCH p.postMedia m
+        LEFT JOIN FETCH p.postMedia m
         WHERE p.group.id=:groupId
         AND p.status = 'PENDING'
     """)
@@ -33,7 +33,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         SELECT p FROM Post p
         JOIN FETCH p.userCreated u
         JOIN FETCH p.group g
-        JOIN FETCH p.postMedia m
+        LEFT JOIN FETCH p.postMedia m
         WHERE p.id =:postId
         AND (p.status = 'PENDING' OR p.status = 'APPROVED')
     """)
