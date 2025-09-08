@@ -74,7 +74,7 @@ public class CommentService {
         List<CommentResponseDTO> response = comments.getContent().stream()
                 .map(commentMapper::toResponseDTO).toList();
 
-        getTotalLikeForComment(response);
+        getTotalReactionForComment(response);
 
         log.info("--------- Get comments successfully ----------");
 
@@ -86,17 +86,17 @@ public class CommentService {
                 .build();
     }
 
-    private void getTotalLikeForComment(List<CommentResponseDTO> commentResponses) {
+    private void getTotalReactionForComment(List<CommentResponseDTO> commentResponses) {
         List<Long> commentIds = commentResponses.stream().map(CommentResponseDTO::getId).toList();
 
-        Map<Long, Long> likeCountMap = commentRepository.findLikeCountForComments(commentIds).stream()
+        Map<Long, Long> reactionCountMap = commentRepository.findCountReactionForComments(commentIds).stream()
                 .collect(Collectors.toMap(
                         row -> (Long) row[0],
                         row -> (Long) row[1]
                 ));
 
         commentResponses.forEach(comment -> {
-            comment.setCountLikes(likeCountMap.get(comment.getId()));
+            comment.setCountReactions(reactionCountMap.get(comment.getId()));
         });
     }
 

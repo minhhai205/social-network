@@ -18,5 +18,5 @@ public class CommentResponseDTO implements Serializable {
     private UserResponseDTO userCreated;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Long countLikes;
+    private Long countReactions;
 }

@@ -23,13 +23,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAll(Specification<Comment> spec, Pageable pageable);
 
     @Query("""
-        SELECT c.id, COUNT(cl.id)
+        SELECT c.id, COUNT(r.id)
         FROM Comment c
-        LEFT JOIN c.commentLikes cl
+        LEFT JOIN c.reactions r
         WHERE c.id IN :commentIds
         GROUP BY c.id
     """)
-    List<Object[]> findLikeCountForComments(@Param("commentIds") List<Long> commentIds);
+    List<Object[]> findCountReactionForComments(@Param("commentIds") List<Long> commentIds);
 
     @Query("""
         SELECT c FROM Comment c

@@ -43,5 +43,5 @@ public class Post extends AbstractEntity<Long>{
     private Set<PostMedia> postMedia;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
-    private Set<PostLike> postLikes;
+    private Set<Reaction> reactions;
 }

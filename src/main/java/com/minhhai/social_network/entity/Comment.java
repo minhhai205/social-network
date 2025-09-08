@@ -30,5 +30,5 @@ public class Comment extends AbstractEntity<Long>{
     private Comment parentComment;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "comment", orphanRemoval = true)
-    private Set<CommentLike> commentLikes;
+    private Set<Reaction> reactions;
 }
