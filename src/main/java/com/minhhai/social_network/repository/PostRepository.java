@@ -42,7 +42,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("""
         SELECT p FROM Post p
         JOIN FETCH p.userCreated u
-        JOIN FETCH p.group g
+        LEFT JOIN FETCH p.group g
         WHERE p.id =:postId
         AND p.status = 'APPROVED'
     """)

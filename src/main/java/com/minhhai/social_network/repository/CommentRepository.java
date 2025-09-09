@@ -35,7 +35,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
         SELECT c FROM Comment c
         JOIN FETCH c.userCreated u
         LEFT JOIN FETCH c.parentComment pc
-        JOIN FETCH c.post p
+        LEFT JOIN FETCH c.post p
         WHERE c.id=:commentId
     """)
     Optional<Comment> findByIdWithAllDetailAndGroup(@Param("commentId") Long commentId);
