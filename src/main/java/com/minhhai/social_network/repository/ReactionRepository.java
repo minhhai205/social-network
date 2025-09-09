@@ -15,6 +15,13 @@ public interface ReactionRepository extends JpaRepository<Reaction, Integer> {
         WHERE r.userReaction.id = :userId
         AND r.post.id = :postId
     """)
-    Optional<Reaction> findReactionByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
+    Optional<Reaction> findByUserIdAndPostId(@Param("userId") Long userId, @Param("postId") Long postId);
+
+    @Query("""
+        SELECT r FROM Reaction r
+        WHERE r.userReaction.id = :userId
+        AND r.comment.id = :commentId
+    """)
+    Optional<Reaction> findByUserIdAndCommentId(@Param("userId") Long userId, @Param("commentId") Long commentId);
 
 }

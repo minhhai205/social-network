@@ -35,10 +35,30 @@ public class SocketReactionService {
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_EXISTED));
         validateGroupAccess(post, userReaction);
 
-        if(checkOldReactionToDelete(userReaction.getId(), postId)) return;
+        Optional<Reaction> oldReaction = reactionRepository.findByUserIdAndPostId(userReaction.getId(), postId);
+        if(oldReaction.isPresent()){
+            reactionRepository.delete(oldReaction.get());
+            return;
+        }
 
-        String contentNoti = userReaction.getFullName() + " just reacted to your post.";
-        createReactionAndSendNotification(userReaction, post.getUserCreated(), post, contentNoti);
+        Reaction reaction = Reaction.builder()
+                .userReaction(userReaction)
+                .post(post)
+                .build();
+        reactionRepository.save(reaction);
+
+        if(!userReaction.getId().equals(post.getUserCreated().getId())){
+            Notification notification = Notification.builder()
+                    .content(userReaction.getFullName() + " just reacted to your post.")
+                    .sendTo(post.getUserCreated())
+                    .type(NotificationType.POST_LIKE)
+                    .post(post)
+                    .build();
+            notificationRepository.save(notification);
+
+            simpMessagingTemplate.convertAndSendToUser(post.getUserCreated().getUsername(),
+                    "/queue/notifications", notificationMapper.toResponseDTO(notification));
+        }
     }
 
     public void handleCommentReaction(long commentId, SimpMessageHeaderAccessor accessor) {
@@ -50,10 +70,31 @@ public class SocketReactionService {
         Post post = comment.getPost();
         validateGroupAccess(post, userReaction);
 
-        if(checkOldReactionToDelete(userReaction.getId(), post.getId())) return;
 
-        String contentNoti = userReaction.getFullName() + " just reacted to your comment.";
-        createReactionAndSendNotification(userReaction, comment.getUserCreated(), post, contentNoti);
+        Optional<Reaction> oldReaction = reactionRepository.findByUserIdAndCommentId(userReaction.getId(), commentId);
+        if(oldReaction.isPresent()){
+            reactionRepository.delete(oldReaction.get());
+            return;
+        }
+
+        Reaction reaction = Reaction.builder()
+                .userReaction(userReaction)
+                .comment(comment)
+                .build();
+        reactionRepository.save(reaction);
+
+        if(!userReaction.getId().equals(comment.getUserCreated().getId())){
+            Notification notification = Notification.builder()
+                    .content(userReaction.getFullName() + " just reacted to your comment.")
+                    .sendTo(comment.getUserCreated())
+                    .type(NotificationType.POST_LIKE)
+                    .post(post)
+                    .build();
+            notificationRepository.save(notification);
+
+            simpMessagingTemplate.convertAndSendToUser(comment.getUserCreated().getUsername(),
+                    "/queue/notifications", notificationMapper.toResponseDTO(notification));
+        }
     }
 
     private User getCurrentUser(SimpMessageHeaderAccessor accessor) {
@@ -67,38 +108,6 @@ public class SocketReactionService {
         if(post.getPostType() == PostType.GROUP){
             groupMemberRepository.findMemberByMemberId(userReaction.getId(), post.getGroup().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.ACCESS_DENIED));
-        }
-    }
-
-    private boolean checkOldReactionToDelete(Long userId, Long postId) {
-        Optional<Reaction> oldReaction = reactionRepository.findReactionByUserIdAndPostId(userId, postId);
-
-        if(oldReaction.isPresent()){
-            reactionRepository.delete(oldReaction.get());
-            return true;
-        }
-
-        return false;
-    }
-
-    private void createReactionAndSendNotification(User from, User to, Post post, String content) {
-        Reaction reaction = Reaction.builder()
-                .userReaction(from)
-                .post(post)
-                .build();
-        reactionRepository.save(reaction);
-
-        if(!from.getId().equals(to.getId())){
-            Notification notification = Notification.builder()
-                    .content(content)
-                    .sendTo(post.getUserCreated())
-                    .type(NotificationType.POST_LIKE)
-                    .post(post)
-                    .build();
-            notificationRepository.save(notification);
-
-            simpMessagingTemplate.convertAndSendToUser(to.getUsername(),
-                    "/queue/notifications", notificationMapper.toResponseDTO(notification));
         }
     }
 }
