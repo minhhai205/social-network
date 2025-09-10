@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @Validated
-@Tag(name = "Group post controller")
+@Tag(name = "User post controller")
 @RequiredArgsConstructor
 @Slf4j
 public class UserPostController {
