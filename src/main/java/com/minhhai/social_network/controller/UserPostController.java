@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,6 +32,17 @@ public class UserPostController {
         return ApiSuccessResponse.<PageResponse<List<PostResponseDTO>>>builder()
                 .data(userPostService.getAllPostActiveWithFilter(userId, pageable, filters))
                 .message("Get all successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/user/post/{postId}/delete")
+    public ApiSuccessResponse<PostResponseDTO> deleteMyPost(
+            @PathVariable @Min(value = 1, message = "Post id must be greater than 0") long postId
+    ) {
+        return ApiSuccessResponse.<PostResponseDTO>builder()
+                .data(userPostService.deleteMyPost(postId))
+                .message("Deleted successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }

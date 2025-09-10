@@ -83,6 +83,7 @@ public class GroupPostService {
         return postMapper.toResponseDTO(postToDelete);
     }
 
+    @Transactional
     public PostResponseDTO adminDeletePost(long postId) {
         String currentUsername = SecurityUtil.getCurrentUsername();
 

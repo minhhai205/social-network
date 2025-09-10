@@ -55,7 +55,7 @@ public class GroupPostController {
     ) {
         return ApiSuccessResponse.<PostResponseDTO>builder()
                 .data(groupPostService.deleteMyPost(postId))
-                .message("leaved successfully!")
+                .message("Deleted successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }
