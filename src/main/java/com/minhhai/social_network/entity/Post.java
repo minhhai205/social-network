@@ -44,4 +44,7 @@ public class Post extends AbstractEntity<Long>{
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
     private Set<Reaction> reactions;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
+    private Set<Comment> comments;
 }
