@@ -5,6 +5,7 @@ import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.exception.auth.AuthException;
 import com.minhhai.social_network.exception.auth.JwtException;
+import com.minhhai.social_network.util.commons.AppConst;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.TokenType;
 import com.nimbusds.jose.*;
@@ -20,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -40,6 +42,7 @@ public class JwtService {
     private String refreshKey;
 
     private final TokenService tokenService;
+    private final RedisService redisService;
 
     public TokenResult generateToken(User user, TokenType tokenType) {
         log.info("------------------------- generate token ------------------------------");
@@ -98,6 +101,10 @@ public class JwtService {
     public void checkTokenInDB(String jti, TokenType tokenType) {
         if (tokenType.equals(TokenType.ACCESS_TOKEN)) {
             // check access token in black-list.....
+//            Optional<String> jtiRedis = redisService.get(AppConst.TOKEN_PREFIX + jti, String.class);
+//            if (jtiRedis.isPresent()) {
+//                throw new JwtException(TokenType.ACCESS_TOKEN);
+//            }
             return;
         } else if (tokenType.equals(TokenType.REFRESH_TOKEN)) {
             tokenService.findByJti(jti)

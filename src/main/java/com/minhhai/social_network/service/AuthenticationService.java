@@ -8,8 +8,10 @@ import com.minhhai.social_network.entity.User;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.exception.auth.JwtException;
 import com.minhhai.social_network.repository.UserRepository;
+import com.minhhai.social_network.util.commons.AppConst;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.TokenType;
+import com.nimbusds.jwt.SignedJWT;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -26,6 +29,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
     public TokenResponseDTO authenticate(LoginRequestDTO loginRequestDTO) {
         log.info("---------- authenticate login ----------");
@@ -92,7 +96,7 @@ public class AuthenticationService {
             var signedRefreshToken = jwtService.verifyToken(refreshToken, TokenType.REFRESH_TOKEN);
 
             // add access token to black-list
-            // .........
+            saveAccessTokenToBlackList(signedAccessToken);
 
             // delete refresh token from DB
             tokenService.deleteByJti(signedRefreshToken.getJWTClaimsSet().getJWTID());
@@ -101,5 +105,13 @@ public class AuthenticationService {
         } catch (ParseException e) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+    }
+
+
+    private void saveAccessTokenToBlackList(SignedJWT signedAccessToken) throws ParseException {
+        String jtiAccessToken = signedAccessToken.getJWTClaimsSet().getJWTID();
+        Date expirationDate = signedAccessToken.getJWTClaimsSet().getExpirationTime();
+        long timeout = (expirationDate.getTime() - new Date().getTime()) / 1000;
+        redisService.save(AppConst.TOKEN_PREFIX + jtiAccessToken, "black_list", timeout);
     }
 }

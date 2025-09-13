@@ -14,6 +14,12 @@ spring:
     username: ${DB.USERNAME}
     password: ${DB.PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+  database:
+    redis:
+      host: ${REDIS.HOST}
+      port: ${REDIS.PORT}
+
   security:
 
     oauth2:
@@ -59,3 +65,4 @@ cloudinary:
   cloud-name: ${CLOUDINARY.CLOUD_NAME}
   api-key: ${CLOUDINARY.CLOUD_KEY}
   api-secret: ${CLOUDINARY.CLOUD_SECRET}
+
