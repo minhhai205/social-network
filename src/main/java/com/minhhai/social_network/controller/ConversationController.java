@@ -3,6 +3,7 @@ package com.minhhai.social_network.controller;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.ApiResponse.PageResponse;
 import com.minhhai.social_network.dto.response.ConversationResponseDTO;
+import com.minhhai.social_network.dto.response.MessageResponseDTO;
 import com.minhhai.social_network.dto.response.PostResponseDTO;
 import com.minhhai.social_network.service.ConversationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +35,20 @@ public class ConversationController {
     ) {
         return ApiSuccessResponse.<PageResponse<List<ConversationResponseDTO>>>builder()
                 .data(conversationService.getAllMyConversationWithFilter(pageable, filters))
+                .message("Get all successfully!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+
+    @GetMapping("/conversation/{conversationId}/all-message")
+    public ApiSuccessResponse<PageResponse<List<MessageResponseDTO>>> getAllMessageConversationWithFilter(
+            @PathVariable @Min(value = 1, message = "Conversation id must be greater than 0") long conversationId,
+            Pageable pageable,
+            @RequestParam(required = false) String... filters
+    ) {
+        return ApiSuccessResponse.<PageResponse<List<MessageResponseDTO>>>builder()
+                .data(conversationService.getAllMessageConversationWithFilter(conversationId, pageable, filters))
                 .message("Get all successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
