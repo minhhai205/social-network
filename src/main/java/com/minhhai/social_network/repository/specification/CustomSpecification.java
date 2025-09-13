@@ -15,6 +15,8 @@ public class CustomSpecification<T> implements Specification<T> {
     @Override
     public Predicate toPredicate(@NonNull final Root<T> root, final CriteriaQuery<?> query,
                                  @NonNull final CriteriaBuilder cb) {
+        // Tránh duplicate entity khi join one-to-many
+        query.distinct(true);
 
         Path<?> path = getPath(root, criteria.getKey());
 
@@ -30,13 +32,34 @@ public class CustomSpecification<T> implements Specification<T> {
         };
     }
 
+    /**
+     * Lấy path từ key. Hỗ trợ join lồng nhau (a.b.c).
+     * Nếu join đã tồn tại thì tái sử dụng, không tạo join mới.
+     */
     private Path<?> getPath(Root<T> root, String key) {
         if (key.contains(".")) {
             String[] parts = key.split("\\.");
             From<?, ?> join = root;
+
             for (int i = 0; i < parts.length - 1; i++) {
-                join = join.join(parts[i], JoinType.LEFT);
+                String joinAttr = parts[i];
+
+                // Kiểm tra join đã tồn tại chưa
+                Join<?, ?> existingJoin = null;
+                for (Join<?, ?> j : join.getJoins()) {
+                    if (j.getAttribute().getName().equals(joinAttr)) {
+                        existingJoin = j;
+                        break;
+                    }
+                }
+
+                if (existingJoin == null) {
+                    join = join.join(joinAttr, JoinType.LEFT);
+                } else {
+                    join = existingJoin;
+                }
             }
+
             return join.get(parts[parts.length - 1]);
         } else {
             return root.get(key);

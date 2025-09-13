@@ -25,6 +25,12 @@ public final class SpecificationsBuilder {
 
     public SpecificationsBuilder with(final String orPredicate, final String key, final String operation,
                                       final String prefix, final Object value, final String suffix) {
+        Object parsedValue = value;
+        if (value instanceof String strVal) {
+            if ("true".equalsIgnoreCase(strVal) || "false".equalsIgnoreCase(strVal)) {
+                parsedValue = Boolean.parseBoolean(strVal);
+            }
+        }
 
         SearchOperation searchOperation = SearchOperation.getSimpleOperation(operation.charAt(0));
 
@@ -49,7 +55,7 @@ public final class SpecificationsBuilder {
             // Xét nếu có cờ ' thì là tìm kiếm theo OR
             boolean orPre = StringUtils.hasLength(orPredicate) && orPredicate.equals(OR_PREDICATE_FLAG);
 
-            params.add(new SpecSearchCriteria(orPre, key, searchOperation, value));
+            params.add(new SpecSearchCriteria(orPre, key, searchOperation, parsedValue));
         }
         return this;
     }

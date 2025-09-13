@@ -1,6 +1,9 @@
 package com.minhhai.social_network.repository;
 
 import com.minhhai.social_network.entity.Conversation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface ConversationRepository extends JpaRepository<Conversation, Long> {
+
+    Page<Conversation> findAll(Specification<Conversation> spec, Pageable pageable);
+
     @Query("""
             SELECT c FROM Conversation c
             JOIN FETCH c.conversationMember cm
