@@ -9,10 +9,7 @@ import com.minhhai.social_network.entity.*;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.mapper.MessageMapper;
 import com.minhhai.social_network.mapper.NotificationMapper;
-import com.minhhai.social_network.repository.ConversationRepository;
-import com.minhhai.social_network.repository.MessageRepository;
-import com.minhhai.social_network.repository.NotificationRepository;
-import com.minhhai.social_network.repository.UserRepository;
+import com.minhhai.social_network.repository.*;
 import com.minhhai.social_network.service.FileService;
 import com.minhhai.social_network.util.enums.ConversationRole;
 import com.minhhai.social_network.util.enums.ErrorCode;
@@ -43,6 +40,7 @@ public class SocketConversationService {
     private final ConversationRepository conversationRepository;
     private final NotificationMapper notificationMapper;
     private final NotificationRepository notificationRepository;
+    private final ConversationMemberRepository conversationMemberRepository;
 
     @Transactional
     public void sendMessage(MessageRequestDTO request, long conversationId, SimpMessageHeaderAccessor accessor) {
@@ -206,16 +204,27 @@ public class SocketConversationService {
         addUserRequest.getMemberIds().stream()
                 .filter(memberId -> !existingMemberIds.contains(memberId))
                 .forEach(memberId -> {
-                    User newMember = userRepository.findById(memberId)
-                            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                    Optional<ConversationMember> oldMemberOptional = conversationMemberRepository
+                            .findOldMemberById(memberId, conversation.getId());
 
-                    conversation.getConversationMember().add(
-                            ConversationMember.builder()
-                                    .user(newMember)
-                                    .conversation(conversation)
-                                    .role(ConversationRole.MEMBER)
-                                    .build()
-                    );
+                    User newMember;
+
+                    if (oldMemberOptional.isPresent()) {
+                        ConversationMember member = oldMemberOptional.get();
+                        member.setDeleted(false);
+                        newMember = member.getUser();
+                    } else{
+                         newMember = userRepository.findById(memberId)
+                                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+                        conversation.getConversationMember().add(
+                                ConversationMember.builder()
+                                        .user(newMember)
+                                        .conversation(conversation)
+                                        .role(ConversationRole.MEMBER)
+                                        .build()
+                        );
+                    }
 
                     // Send notification
                     Notification notification = Notification.builder()
