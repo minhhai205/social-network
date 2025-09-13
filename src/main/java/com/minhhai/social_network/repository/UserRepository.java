@@ -1,6 +1,8 @@
 package com.minhhai.social_network.repository;
 
 import com.minhhai.social_network.entity.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -47,4 +49,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
     })
     @Query("SELECT u FROM User u WHERE u.providerId=:providerId AND u.deleted=false")
     Optional<User> findByProviderId(@Param("providerId") String providerId);
+
+    boolean existsByEmailAndDeletedFalse(String email);
+
+    boolean existsByUsernameAndDeletedFalse(String username);
 }

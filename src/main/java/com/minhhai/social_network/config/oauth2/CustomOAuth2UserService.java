@@ -61,14 +61,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         // Đăng kí user mới nếu chưa tồn tại user
-        registerNewUser(oAuth2UserInfo);
-        User newUser = userRepository.findByProviderId(oAuth2UserInfo.getId()).orElseThrow(
-                () -> new OAuth2Exception(ErrorCode.USER_NOT_EXISTED));
+        User newUser = registerNewUser(oAuth2UserInfo);
 
         return new SecurityUser(newUser, oAuth2User.getAttributes());
     }
 
-    private void registerNewUser(OAuth2UserInfo oAuth2UserInfo) {
+    private User registerNewUser(OAuth2UserInfo oAuth2UserInfo) {
         Role role = roleRepository.findByName("USER")
                 .orElseThrow(() -> new OAuth2Exception(ErrorCode.ROLE_NOT_EXISTED));
 
@@ -87,6 +85,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .password(oAuth2UserInfo.getId())
                 .build();
         userRepository.save(user);
+
+        return user;
     }
 
     private void updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {

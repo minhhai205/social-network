@@ -10,7 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
-    @Query("SELECT r FROM Role r WHERE r.name=:name")
+    @Query("""
+        SELECT r FROM Role r
+        LEFT JOIN FETCH r.permissions p
+        WHERE r.name=:name
+    """)
     Optional<Role> findByName(@Param("name") String name);
 
 }

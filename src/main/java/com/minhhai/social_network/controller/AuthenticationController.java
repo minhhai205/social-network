@@ -1,6 +1,7 @@
 package com.minhhai.social_network.controller;
 
 import com.minhhai.social_network.dto.request.LoginRequestDTO;
+import com.minhhai.social_network.dto.request.RegisterRequestDTO;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.service.AuthenticationService;
@@ -31,6 +32,16 @@ public class AuthenticationController {
         return ApiSuccessResponse.<TokenResponseDTO>builder()
                 .data(authenticationService.authenticate(loginRequestDTO))
                 .message("Authenticated!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/auth/register")
+    public ApiSuccessResponse<TokenResponseDTO> register(
+            @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
+        return ApiSuccessResponse.<TokenResponseDTO>builder()
+                .data(authenticationService.register(registerRequestDTO))
+                .message("Registered successfully!")
                 .status(HttpStatus.OK.value())
                 .build();
     }
