@@ -266,7 +266,7 @@ public class SocketConversationService {
                 .findAny()
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_CONVERSATION));
 
-        conversation.getConversationMember().remove(member);
+        member.setDeleted(true);
 
         String content = MessageFormat.format("{0} just deleted {1} from the chat group.",
                 deletedBy.getFullName(), member.getUser().getFullName());
@@ -286,14 +286,14 @@ public class SocketConversationService {
                 .findAny()
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_IN_CONVERSATION));
 
-        conversation.getConversationMember().remove(member);
+        member.setDeleted(true);
 
         String content = member.getUser().getFullName() + " has left the group.";
         handleDeleteMember(conversation, content);
     }
 
     private void handleDeleteMember(Conversation conversation, String messageContent) {
-        if (conversation.getConversationMember().size() <= 1) {
+        if (conversation.getConversationMember().size() - 1 <= 1) {
             conversation.setDeleted(true);
             conversationRepository.save(conversation);
         } else {

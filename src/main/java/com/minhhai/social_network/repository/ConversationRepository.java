@@ -14,7 +14,9 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
             SELECT c FROM Conversation c
             JOIN FETCH c.conversationMember cm
             JOIN FETCH cm.user u
-            WHERE c.id=:id AND c.deleted=false
+            WHERE c.id=:id
+            AND c.deleted=false
+            AND cm.deleted=false
     """)
     Optional<Conversation> findByIdWithAllMember(@Param("id") Long id);
 
@@ -26,6 +28,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
         AND m1.user.id = :userId1
         AND m2.user.id = :userId2
         AND c.deleted=false
+        AND m1.deleted=false
+        AND m2.deleted=false
     """)
     Optional<Conversation> findOneToOneConversation(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 }

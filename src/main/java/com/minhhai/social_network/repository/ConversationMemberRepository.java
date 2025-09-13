@@ -15,6 +15,7 @@ public interface ConversationMemberRepository extends JpaRepository<Conversation
         WHERE cm.user.username = :username
             AND cm.user.deleted = false
             AND cm.conversation.id = :conversationId
+            AND cm.deleted = false
     """)
     Optional<ConversationMember> findMemberByUsername(@Param("username") String username,
                                             @Param("conversationId") Long conversationId);

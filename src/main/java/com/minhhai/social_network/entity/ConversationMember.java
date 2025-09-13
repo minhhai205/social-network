@@ -31,4 +31,6 @@ public class ConversationMember extends AbstractEntity<Long> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "last_message_read_id")
     private Message lastMessageRead;
+
+    private boolean deleted;
 }
