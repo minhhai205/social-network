@@ -33,15 +33,15 @@ spring:
               - email
               - profile
           facebook:
-            client-id: "id"
-            client-secret: "secret"
+            client-id: ${OAUTH2.FACEBOOK.CLIENT_ID}
+            client-secret: ${OAUTH2.FACEBOOK.CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - email
               - public_profile
           github:
-            client-id: "id"
-            client-secret: "secret"
+            client-id: ${OAUTH2.GITHUB.CLIENT_ID}
+            client-secret: ${OAUTH2.GITHUB.CLIENT_SECRET}
             redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
             scope:
               - user:email
