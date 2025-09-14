@@ -50,6 +50,32 @@ public interface UserRepository extends JpaRepository<User, Long>{
     @Query("SELECT u FROM User u WHERE u.providerId=:providerId AND u.deleted=false")
     Optional<User> findByProviderId(@Param("providerId") String providerId);
 
+    @Query("""
+        SELECT COUNT(p.id) FROM User u
+        LEFT JOIN u.posts p
+        WHERE u.username=:username
+        AND u.deleted=false
+        AND p.postType = 'PERSONAL'
+        AND p.status = 'APPROVED'
+    """)
+    Long findCountPostByUsername(@Param("username") String username);
+
+    @Query("""
+        SELECT COUNT(f.id) FROM User u
+        LEFT JOIN u.followers f
+        WHERE u.username=:username
+        AND u.deleted=false
+    """)
+    Long findCountFollowerByUsername(@Param("username") String username);
+
+    @Query("""
+        SELECT COUNT(f.id) FROM User u
+        LEFT JOIN u.following f
+        WHERE u.username=:username
+        AND u.deleted=false
+    """)
+    Long findCountFollowingByUsername(@Param("username") String username);
+
     boolean existsByEmail(String email);
 
     boolean existsByUsername(String username);
