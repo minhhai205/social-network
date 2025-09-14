@@ -50,7 +50,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     @Query("SELECT u FROM User u WHERE u.providerId=:providerId AND u.deleted=false")
     Optional<User> findByProviderId(@Param("providerId") String providerId);
 
-    boolean existsByEmailAndDeletedFalse(String email);
+    boolean existsByEmail(String email);
 
-    boolean existsByUsernameAndDeletedFalse(String username);
+    boolean existsByUsername(String username);
 }

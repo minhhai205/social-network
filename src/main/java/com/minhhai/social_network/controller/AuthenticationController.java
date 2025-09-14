@@ -2,7 +2,9 @@ package com.minhhai.social_network.controller;
 
 import com.minhhai.social_network.dto.request.LoginRequestDTO;
 import com.minhhai.social_network.dto.request.RegisterRequestDTO;
+import com.minhhai.social_network.dto.request.VerifyRegisterRequestDTO;
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
+import com.minhhai.social_network.dto.response.RegisterResponseDTO;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,10 +39,20 @@ public class AuthenticationController {
     }
 
     @PostMapping("/auth/register")
-    public ApiSuccessResponse<TokenResponseDTO> register(
+    public ApiSuccessResponse<RegisterResponseDTO> register(
             @Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
-        return ApiSuccessResponse.<TokenResponseDTO>builder()
+        return ApiSuccessResponse.<RegisterResponseDTO>builder()
                 .data(authenticationService.register(registerRequestDTO))
+                .message("Registration request successful!")
+                .status(HttpStatus.OK.value())
+                .build();
+    }
+
+    @PostMapping("/auth/verify_register")
+    public ApiSuccessResponse<TokenResponseDTO> verifyRegister(
+            @Valid @RequestBody VerifyRegisterRequestDTO verifyRegisterRequestDTO) {
+        return ApiSuccessResponse.<TokenResponseDTO>builder()
+                .data(authenticationService.verifyRegister(verifyRegisterRequestDTO))
                 .message("Registered successfully!")
                 .status(HttpStatus.OK.value())
                 .build();

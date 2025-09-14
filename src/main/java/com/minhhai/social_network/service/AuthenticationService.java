@@ -2,6 +2,9 @@ package com.minhhai.social_network.service;
 
 import com.minhhai.social_network.dto.request.LoginRequestDTO;
 import com.minhhai.social_network.dto.request.RegisterRequestDTO;
+import com.minhhai.social_network.dto.request.VerifyRegisterRequestDTO;
+import com.minhhai.social_network.dto.response.ReactionResponseDTO;
+import com.minhhai.social_network.dto.response.RegisterResponseDTO;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.entity.Role;
 import com.minhhai.social_network.entity.Token;
@@ -13,11 +16,9 @@ import com.minhhai.social_network.exception.auth.OAuth2Exception;
 import com.minhhai.social_network.repository.RoleRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.commons.AppConst;
-import com.minhhai.social_network.util.enums.AuthProvider;
-import com.minhhai.social_network.util.enums.ErrorCode;
-import com.minhhai.social_network.util.enums.Privacy;
-import com.minhhai.social_network.util.enums.TokenType;
+import com.minhhai.social_network.util.enums.*;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -39,6 +42,10 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
     private final RoleRepository roleRepository;
+    private final MailService mailService;
+    private final OtpService otpService;
+
+    private static final long EXPIRE_SECONDS = 300;
 
     public TokenResponseDTO authenticate(LoginRequestDTO loginRequestDTO) {
         log.info("---------- authenticate login ----------");
@@ -65,11 +72,42 @@ public class AuthenticationService {
                 .build();
     }
 
-    public TokenResponseDTO register(RegisterRequestDTO registerRequestDTO) {
-        if(userRepository.existsByEmailAndDeletedFalse(registerRequestDTO.getEmail())
-                ||userRepository.existsByUsernameAndDeletedFalse(registerRequestDTO.getUsername())){
+    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+        if(userRepository.existsByEmail(registerRequestDTO.getEmail())
+                ||userRepository.existsByUsername(registerRequestDTO.getUsername())){
             throw new AppException(ErrorCode.USER_EXISTED);
         }
+
+        sendMailVerifyRegister(registerRequestDTO.getEmail());
+
+        redisService.save(AppConst.USER_PENDING_PREFIX + registerRequestDTO.getEmail(),
+                registerRequestDTO, EXPIRE_SECONDS);
+
+        return RegisterResponseDTO.builder()
+                .email(registerRequestDTO.getEmail())
+                .build();
+    }
+
+    private void sendMailVerifyRegister(String sendTo) {
+        String subject = "Verify account registration";
+        String otp = otpService.generateOtp(sendTo, OtpType.OTP_REGISTER, EXPIRE_SECONDS);
+        String content = "<h3>OTP của bạn là: <b>" + otp + "</b></h3>"
+                + "<p>Mã này sẽ hết hạn sau 5 phút.</p>";
+        mailService.sendEmail(sendTo, subject, content, null);
+    }
+
+    public TokenResponseDTO verifyRegister(VerifyRegisterRequestDTO verifyRegisterRequestDTO) {
+        String email = verifyRegisterRequestDTO.getEmail();
+        String otp = verifyRegisterRequestDTO.getOtp();
+
+        if(!otpService.verifyOtp(email, OtpType.OTP_REGISTER, otp)){
+            throw new AppException(ErrorCode.OTP_INVALID);
+        }
+
+        RegisterRequestDTO registerRequestDTO = redisService
+                .get(AppConst.USER_PENDING_PREFIX + email, RegisterRequestDTO.class)
+                .orElseThrow(() -> new OAuth2Exception(ErrorCode.USER_NOT_EXISTED));
+        redisService.delete(AppConst.USER_PENDING_PREFIX + email);
 
         Role role = roleRepository.findByName("USER")
                 .orElseThrow(() -> new OAuth2Exception(ErrorCode.ROLE_NOT_EXISTED));
