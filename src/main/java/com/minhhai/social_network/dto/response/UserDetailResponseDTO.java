@@ -1,7 +1,5 @@
 package com.minhhai.social_network.dto.response;
 
-import com.minhhai.social_network.entity.Post;
-import com.minhhai.social_network.entity.Role;
 import com.minhhai.social_network.util.enums.AuthProvider;
 import com.minhhai.social_network.util.enums.Gender;
 import com.minhhai.social_network.util.enums.Privacy;
@@ -10,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.Set;
 
 @Getter
 @Setter

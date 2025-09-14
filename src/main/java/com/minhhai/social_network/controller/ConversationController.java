@@ -4,7 +4,6 @@ import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.ApiResponse.PageResponse;
 import com.minhhai.social_network.dto.response.ConversationResponseDTO;
 import com.minhhai.social_network.dto.response.MessageResponseDTO;
-import com.minhhai.social_network.dto.response.PostResponseDTO;
 import com.minhhai.social_network.service.ConversationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;

@@ -1,7 +1,6 @@
 package com.minhhai.social_network.repository;
 
 import com.minhhai.social_network.entity.ConversationMember;
-import com.minhhai.social_network.entity.GroupMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

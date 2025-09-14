@@ -9,7 +9,6 @@ import com.minhhai.social_network.mapper.PostMapper;
 import com.minhhai.social_network.repository.GroupMemberRepository;
 import com.minhhai.social_network.repository.GroupRepository;
 import com.minhhai.social_network.repository.PostRepository;
-import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.service.helper.PostQueryHelper;
 import com.minhhai.social_network.util.commons.SecurityUtil;
 import com.minhhai.social_network.util.enums.ErrorCode;
@@ -32,7 +31,6 @@ public class GroupPostService {
     private final PostRepository postRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final PostMapper postMapper;
-    private final UserRepository userRepository;
     private final PostQueryHelper postQueryHelper;
 
     public PageResponse<List<PostResponseDTO>> getAllPostActiveWithFilter(

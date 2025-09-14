@@ -1,15 +1,10 @@
 package com.minhhai.social_network.service.socket;
 
-import com.minhhai.social_network.dto.response.GroupMemberResponseDTO;
 import com.minhhai.social_network.entity.*;
 import com.minhhai.social_network.exception.AppException;
-import com.minhhai.social_network.mapper.GroupMapper;
-import com.minhhai.social_network.mapper.GroupMemberMapper;
 import com.minhhai.social_network.mapper.NotificationMapper;
 import com.minhhai.social_network.repository.*;
-import com.minhhai.social_network.util.commons.SecurityUtil;
 import com.minhhai.social_network.util.enums.*;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -26,7 +21,6 @@ import java.util.Optional;
 public class SocketGroupService {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private final GroupMemberMapper groupMemberMapper;
     private final GroupMemberRepository groupMemberRepository;
     private final NotificationRepository notificationRepository;
     private final SimpMessagingTemplate simpMessagingTemplate;

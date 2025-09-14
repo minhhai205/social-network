@@ -1,6 +1,5 @@
 package com.minhhai.social_network.dto.response;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

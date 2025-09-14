@@ -6,8 +6,6 @@ import com.minhhai.social_network.util.enums.GroupRole;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Setter
 @Getter
 @Builder

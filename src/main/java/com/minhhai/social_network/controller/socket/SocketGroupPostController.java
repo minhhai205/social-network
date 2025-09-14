@@ -1,6 +1,5 @@
 package com.minhhai.social_network.controller.socket;
 
-import com.minhhai.social_network.dto.request.CreateGroupRequestDTO;
 import com.minhhai.social_network.dto.request.CreatePostRequestDTO;
 import com.minhhai.social_network.service.socket.SocketGroupPostService;
 import jakarta.validation.Valid;

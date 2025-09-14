@@ -2,7 +2,6 @@ package com.minhhai.social_network.repository;
 
 import com.minhhai.social_network.entity.Conversation;
 import com.minhhai.social_network.entity.Message;
-import com.minhhai.social_network.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

@@ -1,15 +1,12 @@
 package com.minhhai.social_network.service;
 
 import com.minhhai.social_network.dto.response.ApiResponse.PageResponse;
-import com.minhhai.social_network.dto.response.CommentResponseDTO;
 import com.minhhai.social_network.dto.response.ReactionResponseDTO;
-import com.minhhai.social_network.entity.Comment;
 import com.minhhai.social_network.entity.Reaction;
 import com.minhhai.social_network.mapper.ReactionMapper;
 import com.minhhai.social_network.repository.ReactionRepository;
 import com.minhhai.social_network.repository.specification.SpecificationsBuilder;
 import com.minhhai.social_network.util.commons.AppConst;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

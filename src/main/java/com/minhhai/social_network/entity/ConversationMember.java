@@ -5,8 +5,6 @@ import com.minhhai.social_network.util.enums.ConversationRole;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-import java.util.Set;
 
 @Setter
 @Getter

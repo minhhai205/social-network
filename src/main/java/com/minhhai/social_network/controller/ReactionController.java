@@ -2,7 +2,6 @@ package com.minhhai.social_network.controller;
 
 import com.minhhai.social_network.dto.response.ApiResponse.ApiSuccessResponse;
 import com.minhhai.social_network.dto.response.ApiResponse.PageResponse;
-import com.minhhai.social_network.dto.response.CommentResponseDTO;
 import com.minhhai.social_network.dto.response.ReactionResponseDTO;
 import com.minhhai.social_network.service.ReactionService;
 import io.swagger.v3.oas.annotations.tags.Tag;

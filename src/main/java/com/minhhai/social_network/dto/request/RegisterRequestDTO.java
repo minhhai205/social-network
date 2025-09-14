@@ -2,10 +2,6 @@ package com.minhhai.social_network.dto.request;
 
 import com.minhhai.social_network.util.annotations.EnumValue;
 import com.minhhai.social_network.util.enums.Gender;
-import com.minhhai.social_network.util.enums.Privacy;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

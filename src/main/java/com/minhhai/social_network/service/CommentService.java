@@ -7,7 +7,6 @@ import com.minhhai.social_network.mapper.CommentMapper;
 import com.minhhai.social_network.repository.CommentRepository;
 import com.minhhai.social_network.repository.specification.SpecificationsBuilder;
 import com.minhhai.social_network.util.commons.AppConst;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

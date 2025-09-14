@@ -2,10 +2,8 @@ package com.minhhai.social_network.service;
 
 
 import com.minhhai.social_network.dto.response.ApiResponse.PageResponse;
-import com.minhhai.social_network.dto.response.CommentResponseDTO;
 import com.minhhai.social_network.dto.response.ConversationResponseDTO;
 import com.minhhai.social_network.dto.response.MessageResponseDTO;
-import com.minhhai.social_network.dto.response.PostResponseDTO;
 import com.minhhai.social_network.entity.*;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.mapper.ConversationMapper;
@@ -13,12 +11,10 @@ import com.minhhai.social_network.mapper.MessageMapper;
 import com.minhhai.social_network.repository.ConversationMemberRepository;
 import com.minhhai.social_network.repository.ConversationRepository;
 import com.minhhai.social_network.repository.MessageRepository;
-import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.repository.specification.SpecificationsBuilder;
 import com.minhhai.social_network.util.commons.AppConst;
 import com.minhhai.social_network.util.commons.SecurityUtil;
 import com.minhhai.social_network.util.enums.ErrorCode;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

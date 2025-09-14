@@ -2,7 +2,6 @@ package com.minhhai.social_network.service;
 
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.util.enums.ErrorCode;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @Slf4j

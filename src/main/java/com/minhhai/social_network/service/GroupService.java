@@ -17,17 +17,14 @@ import com.minhhai.social_network.repository.GroupRepository;
 import com.minhhai.social_network.repository.JoinGroupRequestRepository;
 import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.commons.SecurityUtil;
-import com.minhhai.social_network.util.enums.ConversationRole;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import com.minhhai.social_network.util.enums.GroupMemberStatus;
 import com.minhhai.social_network.util.enums.GroupRole;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;

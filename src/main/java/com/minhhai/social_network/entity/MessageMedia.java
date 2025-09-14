@@ -1,7 +1,5 @@
 package com.minhhai.social_network.entity;
 
-import com.minhhai.social_network.util.annotations.EnumValue;
-import com.minhhai.social_network.util.enums.MediaType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

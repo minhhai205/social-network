@@ -3,7 +3,6 @@ package com.minhhai.social_network.service;
 import com.minhhai.social_network.dto.request.LoginRequestDTO;
 import com.minhhai.social_network.dto.request.RegisterRequestDTO;
 import com.minhhai.social_network.dto.request.VerifyRegisterRequestDTO;
-import com.minhhai.social_network.dto.response.ReactionResponseDTO;
 import com.minhhai.social_network.dto.response.RegisterResponseDTO;
 import com.minhhai.social_network.dto.response.TokenResponseDTO;
 import com.minhhai.social_network.entity.Role;
@@ -18,18 +17,14 @@ import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.commons.AppConst;
 import com.minhhai.social_network.util.enums.*;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 
 @Slf4j

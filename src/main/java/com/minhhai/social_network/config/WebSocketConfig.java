@@ -3,7 +3,6 @@ package com.minhhai.social_network.config;
 import com.minhhai.social_network.config.security.securityCustom.CustomJwtDecoder;
 import com.minhhai.social_network.exception.AppException;
 import com.minhhai.social_network.repository.ConversationMemberRepository;
-import com.minhhai.social_network.repository.UserRepository;
 import com.minhhai.social_network.util.enums.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +39,6 @@ import java.util.Objects;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final CustomJwtDecoder jwtDecoder;
-    private final UserRepository userRepository;
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
     private final ConversationMemberRepository conversationMemberRepository;
 
