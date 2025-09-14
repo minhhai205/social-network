@@ -17,7 +17,7 @@ The **Social Network** project is built with **Java Spring Boot**, providing cor
 ## 🛠️ Technology Stack
 - **Architecture**: Layer Architecture, Restful APIs, STOMP.
 - **Backend**: Spring boot, Spring Security, Spring Data JPA. 
-- **Database**: MySQL/PostgreSQL  
+- **Database**: MySQL 
 - **Cache & Session**: Redis  
 - **Authentication & Authorization**: Spring Security + JWT, OAuth2  
 - **Real-time Communication**: WebSocket (STOMP protocol)  
@@ -85,28 +85,3 @@ mail.password=your_mail_app_password
 ```
 ### 4️⃣ Running the service
 Run via Maven (`mvn spring-boot:run`), your IDE, or a Docker container.
-
-back-end-app/
-├── src/
-│ └── main/
-│ ├── java/
-│ │ └── com/
-│ │ └── hien/
-│ │ └── back_end_app/
-│ │ ├── config/                     # Project configurations
-│ │ │ ├── security/                 # Security-related configuration
-│ │ │ │ ├── handlers/               # Handlers for authentication & authorization
-│ │ │ │ ├── oauth2/                 # OAuth2 configuration for social login
-│ │ │ │ │ └── models/               # OAuth2 models used in security
-│ │ │ │ └── securityModels/         # Security Models for Spring Security Context
-│ │ ├── controllers/                # Controller Layer (API endpoints)
-│ │ ├── dto/                        # Data Transfer Objects
-│ │ ├── entities/                   # Entity classes (database models)
-│ │ ├── exceptions/                 # Exception handling classes
-│ │ ├── mappers/                    # Mapper utilities (Entity <-> DTO)
-│ │ ├── repositories/               # Data Access Layer (JPA Repositories)
-│ │ ├── services/                   # Service Layer (Business logic)
-│ │ ├── utils/                      # Utility classes
-│ │ └── BackEndAppApplication       # Main Spring Boot Application file
-│ └── resources/
-│ └── application.properties        # Application environment properties
