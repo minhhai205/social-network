@@ -22,8 +22,8 @@ The **Social Network** project is built with **Java Spring Boot**, providing cor
 - **Authentication & Authorization**: Spring Security + JWT, OAuth2  
 - **Real-time Communication**: WebSocket (STOMP protocol)  
 - **Build Tool**: Maven 
-- **Logging**: SLF4J + Logback  
-- **Containerization & Deployment**: Docker.
+- **Logging**: SLF4J + Logback
+- **Testing**: JUnit, Mockito
 - **Other Technologies**:Java Mail, Cloundinary APIs, Spring OAuth2-client dependency.
 ---
 
@@ -31,10 +31,10 @@ The **Social Network** project is built with **Java Spring Boot**, providing cor
 
 ### 1️⃣ Requirements
 - **Java JDK 17+**  
-- **Maven 3.9+** (or Gradle)  
-- **Docker - Docker Desktop** (optional, for MySQL/Redis/Run Project) 
-- **Git**  
-
+- **Maven 3.9+**
+- **MySQL 8.0+**
+- **Redis Server**
+- **Docker (optional, for containerized deployment)** 
 
 ### 2️⃣ Clone Project
 ```bash
@@ -42,7 +42,15 @@ git clone https://github.com/yourusername/social-network.git
 cd social-network
 ```
 
-### 3️⃣ Configure Environment
+### 3️⃣ Create a MySQL database:
+```sql
+CREATE DATABASE social-network
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+```
+
+### 4️⃣ Configure Environment
 Create application-secret.properties in src/main/resources or .env file in the project root:
 ```.env
 # Database configuration
@@ -83,5 +91,5 @@ mail.username=your_email@example.com
 mail.password=your_mail_app_password
 
 ```
-### 4️⃣ Running the service
+### 5️⃣ Running the service
 Run via Maven (`mvn spring-boot:run`), your IDE, or a Docker container.
